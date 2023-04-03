@@ -1,2 +1,2 @@
-# simple
+# simplego
 Simple utilities for Go

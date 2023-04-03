@@ -1,0 +1,12 @@
+services:
+  vscode:
+    image: docker/dev-environments-go:stable-1
+    container_name: vscode_simple
+    entrypoint:
+    - sleep
+    - infinity
+    init: true
+    volumes:
+    - type: bind
+      source: /var/run/docker.sock
+      target: /var/run/docker.sock
