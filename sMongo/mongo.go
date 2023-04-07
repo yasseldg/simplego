@@ -82,31 +82,33 @@ func (c *Collection) Clone(name string) *Collection {
 
 // CreateIndex, create an index for a specific field in a collectionName
 func (c *Collection) CreateIndex(fields interface{}, unique bool) {
-	// 1. Lets define the keys for the index we want to create
-	mod := mongo.IndexModel{
-		Keys:    fields, // index in ascending order or -1 for descending order
-		Options: options.Index().SetUnique(unique),
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), (35 * time.Second))
-	defer cancel()
-
-	// 4. Create a single index
-	count := 0
-	for {
-		index, err := c.Collection.Indexes().CreateOne(ctx, mod)
-		if err == nil {
-			sLog.Info("sMongo: Index %s%s created \n", c.prefix(), index)
-			return
+	if c.Connection.Environment == "write" {
+		// 1. Lets define the keys for the index we want to create
+		mod := mongo.IndexModel{
+			Keys:    fields, // index in ascending order or -1 for descending order
+			Options: options.Index().SetUnique(unique),
 		}
 
-		sLog.Error("sMongo: %sCreateIndex(): %s", c.prefix(), err)
+		ctx, cancel := context.WithTimeout(context.Background(), (35 * time.Second))
+		defer cancel()
 
-		if count > 15 {
-			sLog.Fatal("sMongo: restart App")
+		// 4. Create a single index
+		count := 0
+		for {
+			index, err := c.Collection.Indexes().CreateOne(ctx, mod)
+			if err == nil {
+				sLog.Info("sMongo: Index %s%s created \n", c.prefix(), index)
+				return
+			}
+
+			sLog.Error("sMongo: %sCreateIndex(): %s", c.prefix(), err)
+
+			if count > 15 {
+				sLog.Fatal("sMongo: restart App")
+			}
+
+			time.Sleep(time.Second)
+			count++
 		}
-
-		time.Sleep(time.Second)
-		count++
 	}
 }
