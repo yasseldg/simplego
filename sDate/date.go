@@ -3,6 +3,7 @@ package sDate
 import (
 	"time"
 
+	"github.com/yasseldg/simplego/sCandle"
 	"github.com/yasseldg/simplego/sLog"
 )
 
@@ -30,6 +31,20 @@ func StopTs(stop, periodSeconds, afterSeconds int64) (stopTs time.Time, execute 
 	sLog.Debug("stopTs: %d  --  stop: %d \n", stopTs.Unix(), stop)
 
 	return
+}
+
+func NextStop(ts int64, interval string) int64 {
+	intSec := sCandle.GetIntervalSeconds(interval)
+	diff := ts % intSec
+	return ts - diff + intSec - intSec/10
+}
+
+func Stop(stop time.Time) bool {
+	if stop.Before(time.Now()) {
+		sLog.Info("Exhausted time \n")
+		return true
+	}
+	return false
 }
 
 func FormatD(ts, resp int64) string {
