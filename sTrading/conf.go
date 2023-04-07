@@ -2,6 +2,6 @@ package sTrading
 
 const (
 	// Side
-	SideBuy  = 1
-	SideSell = 2
+	Buy  = 1
+	Sell = 2
 )

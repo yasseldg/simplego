@@ -7,27 +7,27 @@ import (
 func GetSide(s string) int {
 	switch sStr.Lower(s) {
 	case "buy", "1":
-		return SideBuy
-	case "sell", "0":
-		return SideSell
+		return Buy
+	case "sell", "2":
+		return Sell
 	default:
-		return -1
+		return 0
 	}
 }
 
 func IsBuy(s string) bool {
-	return GetSide(s) == SideBuy
+	return GetSide(s) == Buy
 }
 
 func IsSell(s string) bool {
-	return GetSide(s) == SideSell
+	return GetSide(s) == Sell
 }
 
 func GetSideStr(s int) string {
 	switch s {
-	case SideBuy:
+	case Buy:
 		return "Buy"
-	case SideSell:
+	case Sell:
 		return "Sell"
 	default:
 		return ""
