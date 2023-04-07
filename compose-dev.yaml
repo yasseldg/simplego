@@ -10,3 +10,9 @@ services:
     - type: bind
       source: /var/run/docker.sock
       target: /var/run/docker.sock
+    networks:
+      - go_dev
+
+networks:
+  go_dev:
+    name: go_dev
