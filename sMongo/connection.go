@@ -14,24 +14,14 @@ type ConnectionParams struct {
 	Environment      string `yaml: "environment"`
 	Username         string `yaml: "username"`
 	Password         string `yaml: "password"`
-	Protocol         string `yaml: "protocol"`
 	Host             string `yaml: "host"`
 	Port             string `yaml: "port"`
-	AuthDatabase     string `yaml: "auth_atabase"`
-	DirectConnection bool   `yaml: "direct_connection"`
+	AuthDatabase     string `yaml: "authdatabase"`
 	Tls              bool   `yaml: "tls"`
-	ReadPreference   string `yaml: "read_preference"`
-	AuthMechanism    string `yaml: "auth_mechanism"`
-}
-
-func defaultConnectionParams() *ConnectionParams {
-	return &ConnectionParams{
-		Environment:  "read",
-		Username:     "devRead",
-		Password:     "devReadPass",
-		Host:         "mongodb",
-		Port:         "27017",
-		AuthDatabase: "admin"}
+	Protocol         string `yaml: "protocol"`
+	AuthMechanism    string `yaml: "authmechanism"`
+	ReadPreference   string `yaml: "readpreference"`
+	DirectConnection bool   `yaml: "directconnection"`
 }
 
 // GetConnection, Databases access data predefined
@@ -39,17 +29,15 @@ func getConnection(name string) *ConnectionParams {
 	var conn ConnectionParams
 	err := sEnv.LoadYaml(fmt.Sprint(".env/", name, ".mongodb"), &conn)
 	if err != nil {
-		sLog.Error("GetConnectionUri: conn is nil, using default ConnectionParams READ")
-
-		return defaultConnectionParams()
+		sLog.Fatal("sMongo: getConnection: can't load env file %s: %s", name, err)
 	}
 	return &conn
 }
 
 // GetConnectionUri, return (Uri, Credentials)
-func getConnectionUri(conn *ConnectionParams) (string, options.Credential) {
+func (conn *ConnectionParams) getConnectionUri() (string, options.Credential) {
 
-	optCredential := options.Credential{AuthSource: conn.AuthDatabase, Username: conn.Username, Password: conn.Password}
+	optCredential := options.Credential{AuthMechanism: conn.AuthMechanism, AuthSource: conn.AuthDatabase, Username: conn.Username, Password: conn.Password}
 
 	if conn.DirectConnection && conn.Tls && len(conn.ReadPreference) > 0 {
 		return fmt.Sprintf("mongodb://%s:%s@%s:%s/?directConnection=%t&tls=%t&readPreference=%s",
@@ -66,4 +54,19 @@ func getConnectionUri(conn *ConnectionParams) (string, options.Credential) {
 	}
 
 	return fmt.Sprintf("mongodb://%s:%s", conn.Host, conn.Port), optCredential
+}
+
+func (conn *ConnectionParams) getClientOpt() *options.ClientOptions {
+
+	Uri, Credentials := conn.getConnectionUri()
+
+	sLog.Debug("sMongo: Uri: %s  ..  Credentials: %#v", Uri, Credentials)
+
+	switch conn.Environment {
+	case "prod":
+		return options.Client().ApplyURI(Uri)
+
+	default: // dev
+		return options.Client().ApplyURI(Uri).SetAuth(Credentials)
+	}
 }

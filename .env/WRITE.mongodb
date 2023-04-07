@@ -1,6 +1,12 @@
-environment:   write
-username:      devWrite
-password:      devWritePass
-host:          mongo_db
-port:          27017
-auth_database: admin
+environment:     write
+username:        devWrite
+password:        devWritePass
+host:            mongo_db
+port:            27017
+authdatabase:    admin
+
+tls:
+protocol:
+authmechanism:
+readpreference:
+directconnection:

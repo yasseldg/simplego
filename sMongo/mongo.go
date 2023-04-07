@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/yasseldg/simplego/sConv"
+	"github.com/yasseldg/simplego/sEnv"
 	"github.com/yasseldg/simplego/sLog"
 
 	"github.com/yasseldg/mgm/v4"
@@ -13,55 +15,73 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func getClientOpt(conn *ConnectionParams) *options.ClientOptions {
-
-	Uri, Credentials := getConnectionUri(conn)
-
-	switch conn.Environment {
-	case "prod":
-		return options.Client().ApplyURI(Uri)
-
-	default: // dev
-		return options.Client().ApplyURI(Uri).SetAuth(Credentials)
-	}
+type Collection struct {
+	Connection *ConnectionParams
+	Database   *mongo.Database
+	Collection *mgm.Collection
 }
 
-func getContext() (context.Context, context.CancelFunc) {
-	return context.WithTimeout(context.Background(), (5 * time.Second))
-}
+// New
+func New(env, connection, database, collection string) *Collection {
+	var c Collection
 
-func getDatabase(conn *ConnectionParams, database string) *mongo.Database {
+	mgm.SetDefaultConfig(getCtx(env))
 
-	ctx, cancel := getContext()
-	defer cancel()
+	c.Connection = getConnection(sEnv.Get(fmt.Sprint("CONN_", env), connection))
 
-	clientOpt := getClientOpt(conn)
-
-	client, err := mongo.Connect(ctx, clientOpt)
+	client, err := mgm.NewClient(c.Connection.getClientOpt())
 	if err != nil {
-		sLog.Fatal("getDatabase: mongo.Connect(ctx, ClientOpt): %s", err)
+		sLog.Error("sMongo.New: mgm.NewClient() for %s.%s: %s", database, collection, err)
+		return nil
 	}
 
-	err = client.Ping(ctx, nil)
-	if err != nil {
-		sLog.Fatal(err.Error())
+	c.Database = client.Database((sEnv.Get(fmt.Sprint("DB_", env), database)))
+	if c.Database == nil {
+		sLog.Error("sMongo.New: client.Database() for %s.%s", database, collection)
+		return nil
 	}
 
-	return client.Database(database)
+	c.Collection = mgm.NewCollection(c.Database, sEnv.Get(fmt.Sprint("COLL_", env), collection))
+	if c.Collection == nil {
+		sLog.Error("sMongo.New: mgm.NewCollection() for %s.%s", database, collection)
+		return nil
+	}
+
+	c.print()
+
+	return &c
 }
 
-func getMgmColl(conn *ConnectionParams, database, collection string) *mgm.Collection {
+func getCtx(env string) *mgm.Config {
+	return &mgm.Config{
+		CtxTimeout: time.Duration(sConv.GetInt(sEnv.Get(fmt.Sprint("CTX_", env), "10"))) * time.Second,
+	}
+}
 
+func (c *Collection) print() {
 	fmt.Println()
 	time.Sleep(1 * time.Second)
-	sLog.Info("Host: %s  ..  Env: %s  ..  AuthDB: %s  ..  User: %s  ..  Database: %s  ..  Collection: %s", conn.Host, conn.Environment, conn.AuthDatabase, conn.Username, database, collection)
-
-	return &mgm.Collection{Collection: getDatabase(conn, database).Collection(collection)}
+	sLog.Info("sMongo: Host: %s  ..  Env: %s  ..  AuthDB: %s  ..  User: %s  ..  Database: %s  ..  Collection: %s \n",
+		c.Connection.Host, c.Connection.Environment, c.Connection.AuthDatabase, c.Connection.Username, c.Database.Name(), c.Collection.Name())
 }
 
-// CreateIndex - creates an index for a specific field in a collection
-func cicleCreateIndex(coll *mgm.Collection, fields interface{}, unique bool) error {
+func (c *Collection) prefix() string {
+	return fmt.Sprintf("%s.%s.", c.Database.Name(), c.Collection.Name())
+}
 
+// Clone, create Connection to a new collection in the same DB
+func (c *Collection) Clone(name string) *Collection {
+	clone := *c
+	clone.Collection = mgm.NewCollection(c.Database, name)
+	if clone.Collection == nil {
+		sLog.Error("sMongo.Clone: mgm.NewCollection() for %s.%s", c.Database.Name(), name)
+		return nil
+	}
+	return &clone
+}
+
+// CreateIndex, create an index for a specific field in a collectionName
+func (c *Collection) CreateIndex(fields interface{}, unique bool) {
 	// 1. Lets define the keys for the index we want to create
 	mod := mongo.IndexModel{
 		Keys:    fields, // index in ascending order or -1 for descending order
@@ -74,19 +94,19 @@ func cicleCreateIndex(coll *mgm.Collection, fields interface{}, unique bool) err
 	// 4. Create a single index
 	count := 0
 	for {
-		_, err := coll.Indexes().CreateOne(ctx, mod)
+		index, err := c.Collection.Indexes().CreateOne(ctx, mod)
 		if err == nil {
-			return nil
-		} else {
-			sLog.Error("coll.Indexes().CreateOne(ctx, mod): %s", err)
+			sLog.Info("sMongo: Index %s%s created \n", c.prefix(), index)
+			return
+		}
+
+		sLog.Error("sMongo: %sCreateIndex(): %s", c.prefix(), err)
+
+		if count > 15 {
+			sLog.Fatal("sMongo: restart App")
 		}
 
 		time.Sleep(time.Second)
 		count++
-
-		if count > 15 {
-			sLog.Error("Mongo DB: %s.%s CreateIndex failure ", coll.Database().Name(), coll.Name())
-			sLog.Fatal(err.Error())
-		}
 	}
 }

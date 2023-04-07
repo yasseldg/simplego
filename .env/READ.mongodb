@@ -1,6 +1,12 @@
-environment:   read
-username:      devRead
-password:      devReadPass
-host:          mongo_db
-port:          27017
-auth_database: admin
+environment:     read   
+username:        devRead
+password:        devReadPass
+host:            mongo_db
+port:            27017
+authdatabase:    admin
+
+tls:
+protocol:
+authmechanism:
+readpreference:
+directconnection:
