@@ -49,8 +49,8 @@ func TemplateFuncs(name ...string) template.FuncMap {
 			return sConv.GetInt(s)
 		},
 
-		"FormatD": func(ts, resp int64) string {
-			return sDate.FormatD(ts, resp)
+		"FormatD": func(value any, prec int64) string {
+			return sDate.ForWeb(value, prec)
 		},
 
 		"GetValues": func(str, vt string) []string {

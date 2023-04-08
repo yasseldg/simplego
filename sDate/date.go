@@ -1,6 +1,8 @@
 package sDate
 
 import (
+	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/yasseldg/simplego/sCandle"
@@ -47,13 +49,68 @@ func Stop(stop time.Time) bool {
 	return false
 }
 
-func FormatD(ts, resp int64) string {
-	switch resp {
+func FormatD(t time.Time, prec int64) string {
+	switch prec {
+	case 0:
+		return t.Format("2006-01-02")
 	case 1:
-		return time.Unix(ts, 0).Format("2006-01-02 15:04")
-	case 2:
-		return time.Unix(ts, 0).Format("2006-01-02 15:04:05")
+		return t.Format("2006-01-02 15:04")
 	default:
-		return time.Unix(ts, 0).Format("2006-01-02")
+		return t.Format("2006-01-02 15:04:05")
+	}
+}
+
+func ForLog(value any, prec int64) string {
+	t, err := ToTime(value)
+	if err != nil {
+		return fmt.Sprintf("%v", value)
+	}
+	return fmt.Sprintf("%d ( %s )", t.Unix(), FormatD(t, prec))
+}
+
+func ForWeb(value any, prec int64) string {
+	t, err := ToTime(value)
+	if err != nil {
+		return fmt.Sprintf("%v", value)
+	}
+	return fmt.Sprintf("%d <br> %s", t.Unix(), FormatD(t, prec))
+}
+
+func ToTime(value any) (time.Time, error) {
+
+	sLog.Debug("value: %v ( %T )", value, value)
+	switch v := value.(type) {
+	case int:
+		// Convertir timestamp de tipo int o int64 a time.Time
+		return time.Unix(int64(v), 0), nil
+	case int64:
+		// Convertir timestamp de tipo int o int64 a time.Time
+		return time.Unix(v, 0), nil
+	case time.Time:
+		// Devolver valor time.Time directamente
+		return v, nil
+	case string:
+		// Convertir cadena a time.Time
+		// Comprobar si la cadena representa un timestamp
+		if t, err := strconv.ParseInt(v, 10, 64); err == nil {
+			return time.Unix(t, 0), nil
+		}
+		// Comprobar si la cadena representa una fecha y hora con segundos
+		if t, err := time.Parse("2006-01-02 15:04:05", v); err == nil {
+			return t, nil
+		}
+		// Comprobar si la cadena representa una fecha y hora sin segundos
+		if t, err := time.Parse("2006-01-02 15:04", v); err == nil {
+			return t, nil
+		}
+		// Comprobar si la cadena representa una fecha
+		if t, err := time.Parse("2006-01-02", v); err == nil {
+			return t, nil
+		}
+		// Si no es un timestamp ni una fecha válida, devolver error
+		return time.Time{}, fmt.Errorf("cadena %v no es un timestamp ni una fecha válida", v)
+	default:
+		// Si el valor no es int, int64, time.Time o string, devolver error
+		return time.Time{}, fmt.Errorf("valor %v no es de tipo int, int64, time.Time o string", v)
 	}
 }
