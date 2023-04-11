@@ -27,7 +27,7 @@ type ConnectionParams struct {
 // GetConnection, Databases access data predefined
 func getConnection(name string) *ConnectionParams {
 	var conn ConnectionParams
-	err := sEnv.LoadYaml(fmt.Sprint(".env/", name, ".mongodb"), &conn)
+	err := sEnv.LoadYaml(fmt.Sprint(".env/mongodb/", name, ".yaml"), &conn)
 	if err != nil {
 		sLog.Fatal("sMongo: getConnection: can't load env file %s: %s", name, err)
 	}

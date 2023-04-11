@@ -44,9 +44,9 @@ func GetSliceInt(env_name string, defaults []int) (res []int) {
 }
 
 // LoadYaml
-func LoadYaml(file_name string, obj interface{}) error {
+func LoadYaml(file_path string, obj interface{}) error {
 
-	data, err := os.ReadFile(file_name)
+	data, err := os.ReadFile(file_path)
 	if err != nil {
 		return err
 	}
