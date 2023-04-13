@@ -5,9 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/yasseldg/simplego/sCandle"
 	"github.com/yasseldg/simplego/sEnv"
-	"github.com/yasseldg/simplego/sLog"
 )
 
 var DateSeparator = "."
@@ -16,46 +14,7 @@ func init() {
 	DateSeparator = sEnv.Get("DateSeparator", DateSeparator)
 }
 
-// StopTs, periodSeconds, afterSeconds, estare procesando hasta (2 * afterSeconds) seg antes del siguiente cierre de vela
-func StopTs(stop, periodSeconds, afterSeconds int64) (stopTs time.Time, execute bool) {
-	execute = true
-	timeProcess := (periodSeconds - (2 * afterSeconds))
-	stopTs = time.Now().Add(time.Second * time.Duration(timeProcess))
-
-	sLog.Debug("stopTs: %d  --  timeProcess: %d ", stopTs.Unix(), timeProcess)
-
-	timePeriodSec := (time.Now().Unix() % periodSeconds)
-	if timePeriodSec > afterSeconds {
-		stopTs = stopTs.Add(time.Second * time.Duration(-timePeriodSec))
-		execute = false
-	}
-
-	sLog.Debug("stopTs: %d  --  timePeriodSec: %d ", stopTs.Unix(), timePeriodSec)
-
-	if stop < stopTs.Unix() {
-		stopTs = time.Unix(stop, 0)
-	}
-
-	sLog.Debug("stopTs: %d  --  stop: %d \n", stopTs.Unix(), stop)
-
-	return
-}
-
-func NextStop(ts int64, interval string) int64 {
-	intSec := sCandle.GetIntervalSeconds(interval)
-	diff := ts % intSec
-	return ts - diff + intSec - intSec/10
-}
-
-func Stop(stop time.Time) bool {
-	if stop.Before(time.Now()) {
-		sLog.Info("Exhausted time \n")
-		return true
-	}
-	return false
-}
-
-func FormatD(t time.Time, prec int64) string {
+func format(t time.Time, prec int64) string {
 	df := fmt.Sprintf("2006%s01%s02", DateSeparator, DateSeparator)
 	switch prec {
 	case 1:
@@ -71,12 +30,20 @@ func FormatD(t time.Time, prec int64) string {
 	}
 }
 
+func FormatD(value any, prec int64) string {
+	t, err := ToTime(value)
+	if err != nil {
+		return fmt.Sprintf("%v", value)
+	}
+	return format(t, prec)
+}
+
 func ForLog(value any, prec int64) string {
 	t, err := ToTime(value)
 	if err != nil {
 		return fmt.Sprintf("%v", value)
 	}
-	return fmt.Sprintf("%d ( %s )", t.Unix(), FormatD(t, prec))
+	return fmt.Sprintf("%d ( %s )", t.Unix(), format(t, prec))
 }
 
 func ForWeb(value any, prec int64) string {
@@ -84,7 +51,7 @@ func ForWeb(value any, prec int64) string {
 	if err != nil {
 		return fmt.Sprintf("%v", value)
 	}
-	return fmt.Sprintf("%d <br> %s", t.Unix(), FormatD(t, prec))
+	return fmt.Sprintf("%d <br> %s", t.Unix(), format(t, prec))
 }
 
 func ToTime(value any) (time.Time, error) {
