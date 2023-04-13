@@ -10,9 +10,10 @@ import (
 	"strings"
 
 	"github.com/yasseldg/simplego/sLog"
+	"github.com/yasseldg/simplego/sStr"
 )
 
-func FilesOnDir(dir_path string) []fs.FileInfo {
+func FilesOnDir(dir_path string, patterns ...string) []fs.FileInfo {
 
 	entries, err := os.ReadDir(dir_path)
 	if err != nil {
@@ -24,8 +25,11 @@ func FilesOnDir(dir_path string) []fs.FileInfo {
 		info, err := entry.Info()
 		if err != nil {
 			sLog.Error("FilesOnDir entry.Info(): %s ", err)
+			continue
 		}
-		infos = append(infos, info)
+		if sStr.FindPatterns(info.Name(), patterns...) {
+			infos = append(infos, info)
+		}
 	}
 
 	return infos
