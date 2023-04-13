@@ -15,7 +15,7 @@ type TsModel struct {
 // First, $gte: tsFrom  $lt: tsTo, tsFrom = tsTo = 0 for "ts" first object,
 func (c *Collection) First(tsFrom, tsTo int64, obj mgm.Model) error {
 
-	return c.FindOne(GetTsFilter(tsFrom, tsTo), *options.FindOne().SetSort(bson.M{"ts": 1}), obj)
+	return c.FindOne(GetTsFilter(tsFrom, tsTo), *options.FindOne().SetSort(bson.D{{"ts", 1}}), obj)
 }
 
 // Last, $gte: tsFrom  $lt: tsTo, tsFrom = tsTo = 0 for first
@@ -32,7 +32,7 @@ func (c *Collection) FirstTs(tsFrom, tsTo int64) int64 {
 // Last, $gte: tsFrom  $lt: tsTo, tsFrom = tsTo = 0 for "ts" Last object,
 func (c *Collection) Last(tsFrom, tsTo int64, obj mgm.Model) error {
 
-	return c.FindOne(GetTsFilter(tsFrom, tsTo), *options.FindOne().SetSort(bson.M{"ts": -1}), obj)
+	return c.FindOne(GetTsFilter(tsFrom, tsTo), *options.FindOne().SetSort(bson.D{{"ts", -1}}), obj)
 }
 
 // Last, $gte: tsFrom  $lt: tsTo, tsFrom = tsTo = 0 for last
