@@ -14,6 +14,8 @@ func GetIntervalMinutes(interval string) int64 {
 		return 240
 	case "D", "candle1D", "1Dutc", "1440", "1d":
 		return 1440
+	case "W":
+		return 10080
 	default:
 		return 0
 	}

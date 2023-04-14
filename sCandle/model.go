@@ -6,10 +6,16 @@ type OHLC struct {
 	Low   float64 `bson:"l" json:"l"`
 	Close float64 `bson:"c" json:"c"`
 }
+type OHLCs []*OHLC
+
+type OHLCV struct {
+	OHLC   `bson:",inline"`
+	Volume float64 `bson:"v" json:"v"`
+}
+type OHLCVs []*OHLCV
 
 type Candle struct {
 	UnixTs int64 `bson:"ts" json:"ts"`
-	OHLC   `bson:",inline"`
+	OHLCV  `bson:",inline"`
 }
-
 type Candles []*Candle

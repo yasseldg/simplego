@@ -7,6 +7,12 @@ import (
 	"github.com/yasseldg/simplego/sLog"
 )
 
+func PrevTs(ts int64, interval string) int64 {
+	intSec := sCandle.GetIntervalSeconds(interval)
+	diff := ts % intSec
+	return ts - diff
+}
+
 func NextStop(ts int64, interval string) int64 {
 	intSec := sCandle.GetIntervalSeconds(interval)
 	diff := ts % intSec
