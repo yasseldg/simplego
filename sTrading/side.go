@@ -4,6 +4,12 @@ import (
 	"github.com/yasseldg/simplego/sStr"
 )
 
+const (
+	// Side
+	Buy  = 1
+	Sell = 2
+)
+
 func GetSide(s string) int {
 	switch sStr.Lower(s) {
 	case "buy", "1":
