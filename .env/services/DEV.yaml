@@ -1,0 +1,4 @@
+url: data_center
+isexternal: false
+port: 4000
+pathprefix: graphql

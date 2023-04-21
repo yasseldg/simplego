@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/yasseldg/simplego/sEnv"
 	"github.com/yasseldg/simplego/sLog"
 )
 
@@ -16,29 +17,47 @@ type Header struct {
 
 type Headers []Header
 
-type Conf struct {
-	Container  string
+type Config struct {
+	Url        string
 	IsExternal bool
 	Port       int
 	PathPrefix string
 	Headers    Headers
 }
 
-func GetServiceUrl(service *Conf) string {
-	if service.IsExternal {
-		return fmt.Sprintf("https://%s%s", service.Container, service.PathPrefix)
+// GetConfig
+func GetConfig(env string) *Config {
+	name := sEnv.Get(fmt.Sprintf("SERV_%s", env), "DEV")
+	var conf Config
+	err := sEnv.LoadYaml(fmt.Sprint(".env/services/", name, ".yaml"), &conf)
+	if err != nil {
+		sLog.Fatal("sNet: getConf: can't load env file %s: %s", name, err)
 	}
-	return fmt.Sprintf("http://%s:%d%s", service.Container, service.Port, service.PathPrefix)
+	return &conf
 }
 
-func Call(service *Conf, method string, params string, body io.Reader) ([]byte, error) {
+func (c *Config) GetUrl() string {
+	url := c.Url
+	if c.Port > 0 {
+		url = fmt.Sprintf("%s:%d", url, c.Port)
+	}
+	if len(c.PathPrefix) > 0 {
+		url = fmt.Sprintf("%s/%s", url, c.PathPrefix)
+	}
+	if c.IsExternal {
+		return fmt.Sprintf("https://%s", url)
+	}
+	return fmt.Sprintf("http://%s", url)
+}
+
+func (c *Config) Call(method string, params string, body io.Reader) ([]byte, error) {
 
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
 	}
 
-	url := GetServiceUrl(service)
+	url := c.GetUrl()
 	if len(params) > 0 {
 		url = fmt.Sprintf("%s/%s", url, params)
 	}
@@ -48,7 +67,7 @@ func Call(service *Conf, method string, params string, body io.Reader) ([]byte, 
 		return nil, fmt.Errorf("Call: http.NewRequest(): %s ", err)
 	}
 
-	for _, header := range service.Headers {
+	for _, header := range c.Headers {
 		request.Header.Add(header.Key, header.Value)
 	}
 
