@@ -22,7 +22,7 @@ type Collection struct {
 }
 
 // New
-func New(env, connection, database, collection string) *Collection {
+func New(env, connection, database, collection, interval string) *Collection {
 	var c Collection
 
 	mgm.SetDefaultConfig(getCtx(env))
@@ -41,7 +41,12 @@ func New(env, connection, database, collection string) *Collection {
 		return nil
 	}
 
-	c.Collection = mgm.NewCollection(c.Database, sEnv.Get(fmt.Sprint("COLL_", env), collection))
+	coll_name := sEnv.Get(fmt.Sprint("COLL_", env), collection)
+	if len(interval) > 0 {
+		coll_name = fmt.Sprintf("%s_%s", coll_name, interval)
+	}
+
+	c.Collection = mgm.NewCollection(c.Database, coll_name)
 	if c.Collection == nil {
 		sLog.Error("sMongo.New: mgm.NewCollection() for %s.%s", database, collection)
 		return nil
