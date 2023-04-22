@@ -45,6 +45,14 @@ func (c *Config) Update(env string) {
 	c.PathPrefix = sEnv.Get(fmt.Sprintf("%s_Path_Prefix", env), c.PathPrefix)
 }
 
+func (c *Config) AddHeaders(headers Headers) {
+	c.Headers = append(c.Headers, headers...)
+}
+
+func (c *Config) Print(name string) {
+	sLog.Info("%s: %s ", name, c.GetUrl())
+}
+
 func (c *Config) GetUrl() string {
 	url := c.Url
 	if c.Port > 0 {
