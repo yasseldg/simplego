@@ -28,12 +28,13 @@ type Config struct {
 
 // GetConfig
 func GetConfig(env string) *Config {
-	name := sEnv.Get(fmt.Sprintf("SERV_%s", env), "DEV")
+	name := sEnv.Get(env, "DEV")
 	var conf Config
 	err := sEnv.LoadYaml(fmt.Sprint(".env/services/", name, ".yaml"), &conf)
 	if err != nil {
 		sLog.Fatal("sNet: getConf: can't load env file %s: %s", name, err)
 	}
+	conf.Update(env)
 	return &conf
 }
 
