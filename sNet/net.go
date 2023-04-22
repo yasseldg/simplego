@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/yasseldg/simplego/sConv"
 	"github.com/yasseldg/simplego/sEnv"
 	"github.com/yasseldg/simplego/sLog"
 )
@@ -19,7 +20,7 @@ type Headers []Header
 
 type Config struct {
 	Url        string
-	IsExternal bool
+	Secure     bool
 	Port       int
 	PathPrefix string
 	Headers    Headers
@@ -36,6 +37,13 @@ func GetConfig(env string) *Config {
 	return &conf
 }
 
+func (c *Config) Update(env string) {
+	c.Url = sEnv.Get(fmt.Sprintf("%s_Url", env), c.Url)
+	c.Port = sConv.GetInt(sEnv.Get(fmt.Sprintf("%s_Port", env), sConv.GetStrI(c.Port)))
+	c.Secure = sConv.GetBool(sEnv.Get(fmt.Sprintf("%s_Secure", env), sConv.GetStrB(c.Secure)))
+	c.PathPrefix = sEnv.Get(fmt.Sprintf("%s_Path_Prefix", env), c.PathPrefix)
+}
+
 func (c *Config) GetUrl() string {
 	url := c.Url
 	if c.Port > 0 {
@@ -44,7 +52,7 @@ func (c *Config) GetUrl() string {
 	if len(c.PathPrefix) > 0 {
 		url = fmt.Sprintf("%s/%s", url, c.PathPrefix)
 	}
-	if c.IsExternal {
+	if c.Secure {
 		return fmt.Sprintf("https://%s", url)
 	}
 	return fmt.Sprintf("http://%s", url)

@@ -1,4 +1,4 @@
 url: data_center
-isexternal: false
+secure: false
 port: 4000
 pathprefix: graphql
