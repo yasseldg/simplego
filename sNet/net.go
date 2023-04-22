@@ -80,13 +80,13 @@ func (c *Config) Call(method string, params string, body io.Reader) ([]byte, err
 		request.Header.Add(header.Key, header.Value)
 	}
 
-	sLog.Info("Call: request: %v ", request)
+	sLog.Debug("Call: request: %v ", request)
 
 	resp, err := client.Do(request)
 	if err != nil {
 		return nil, fmt.Errorf("Call: client.Do(request): %s ", err)
 	}
-	sLog.Info("Call: resp: %v ", resp)
+	sLog.Debug("Call: resp: %v ", resp)
 
 	defer resp.Body.Close()
 
