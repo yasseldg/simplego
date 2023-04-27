@@ -8,11 +8,21 @@ import (
 	"github.com/yasseldg/simplego/sLog"
 )
 
-func ToObj(msg string, obj any) {
+func ToObj(msg string, obj any) error {
 	err := json.Unmarshal([]byte(msg), obj)
 	if err != nil {
 		sLog.Error("json.Unmarshal([]byte(msg), obj): %s", err)
+		return err
 	}
+	return nil
+}
+
+func ToJson(v interface{}) (string, error) {
+	result, err := json.Marshal(v)
+	if err != nil {
+		return "", err
+	}
+	return string(result), nil
 }
 
 func Export(path string, objects any) (err error) {
