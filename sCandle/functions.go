@@ -25,6 +25,7 @@ func GetIntervalSeconds(interval string) int64 {
 	return GetIntervalMinutes(interval) * 60
 }
 
+// IsClosing, ts is in seconds
 func IsClosing(ts int64, interval string) bool {
 	return (ts % GetIntervalSeconds(interval)) == 0
 }
@@ -33,8 +34,23 @@ func GetIntervalSecondsMilli(interval string) int64 {
 	return GetIntervalSeconds(interval) * 1000
 }
 
+// IsClosingMilli, ts is in milliseconds
 func IsClosingMilli(ts int64, interval string) bool {
 	return IsClosing(ts/1000, interval)
+}
+
+// PrevTs, ts is in seconds
+func PrevTs(ts int64, interval string) int64 {
+	intSec := GetIntervalSeconds(interval)
+	diff := ts % intSec
+	return ts - diff
+}
+
+// NextTs, ts is in seconds
+func NextTs(ts int64, interval string) int64 {
+	intSec := GetIntervalSeconds(interval)
+	diff := ts % intSec
+	return ts - diff + intSec
 }
 
 func GetIntervalGraphql(interval string) string {
