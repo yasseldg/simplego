@@ -1,10 +1,22 @@
 package sSlice
 
 func InStrings(needle string, values []string) bool {
-	for _, v := range values {
+	return InStringsPos(needle, values) >= 0
+}
+
+func InStringsPos(needle string, values []string) int {
+	for i, v := range values {
 		if v == needle {
-			return true
+			return i
 		}
 	}
-	return false
+	return -1
+}
+
+func MapNames(values map[string]any) []string {
+	names := []string{}
+	for v := range values {
+		names = append(names, v)
+	}
+	return names
 }

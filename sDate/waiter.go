@@ -1,37 +1,49 @@
 package sDate
 
 import (
-	"sort"
 	"sync"
 	"time"
 
-	"github.com/yasseldg/simplego/unique"
+	"github.com/yasseldg/simplego/sSlice"
 )
 
 type Waiter struct {
-	Group sync.WaitGroup
-	names []string
-	poss  []int
-	proc  chan int
-	stop  chan bool
+	Group   sync.WaitGroup
+	process map[string]int
+	poss    []int
+	proc    chan int
+	stop    chan bool
 }
 
-func NewWaiter(names ...string) *Waiter {
+func NewWaiter(process map[string]int) *Waiter {
+	l := len(process)
 	w := &Waiter{
-		proc:  make(chan int),
-		stop:  make(chan bool, 1),
-		names: names,
+		proc:    make(chan int, l),
+		stop:    make(chan bool, 1),
+		process: process,
 	}
-	w.Group.Add(len(names))
+	w.Group.Add(l)
 	return w
+}
+
+// Wait waits for all the processes to finish, with a timeout if specified
+func (w *Waiter) Wait(timeout time.Duration) {
+	if timeout > 0 {
+		go w.timeOut(timeout)
+	}
+
+	go func() {
+		defer w.close()
+		w.Group.Wait()
+	}()
 }
 
 func (w *Waiter) Done(n int, stop bool) {
 	select {
 	case <-w.stop:
 		return
+	case w.proc <- n:
 	default:
-		w.proc <- n
 	}
 
 	if stop {
@@ -39,12 +51,31 @@ func (w *Waiter) Done(n int, stop bool) {
 	}
 }
 
-func (w *Waiter) timeOut(t time.Duration) {
-	go func() {
-		time.Sleep(t)
+func (w *Waiter) Proc() []string {
+	for {
+		select {
+		case n, ok := <-w.proc:
+			if !ok {
+				return w.remaining()
+			}
+			if n == 0 {
+				return w.remaining()
+			}
+			w.poss = append(w.poss, n)
+			w.Group.Done()
+		case <-w.stop:
+			return w.remaining()
+		}
+	}
+}
 
+func (w *Waiter) timeOut(t time.Duration) {
+	select {
+	case <-w.stop:
+		return
+	case <-time.After(t):
 		w.Done(0, true)
-	}()
+	}
 }
 
 func (w *Waiter) close() {
@@ -53,40 +84,11 @@ func (w *Waiter) close() {
 }
 
 func (w *Waiter) remaining() []string {
-
-	sort.Ints(w.poss)
-	unique.Ints(&w.poss)
-	sort.Sort(sort.Reverse(sort.IntSlice(w.poss)))
-
-	for _, p := range w.poss {
-		w.names = append(w.names[:p], w.names[p+1:]...)
-	}
-
-	return w.names
-}
-
-func (w *Waiter) Proc() []string {
-	for n := range w.proc {
-		if n == 0 {
-			return w.remaining()
+	r := make([]string, 0)
+	for name, p := range w.process {
+		if !sSlice.InInts(p, w.poss) {
+			r = append(r, name)
 		}
-
-		w.poss = append(w.poss, n-1)
-		w.Group.Done()
 	}
-
-	return []string{}
-}
-
-// wg.Wait and TimeOut, timeout = 0 = disable
-func (w *Waiter) Wait(timeout time.Duration) {
-
-	if timeout > 0 {
-		w.timeOut(timeout)
-	}
-
-	go func() {
-		defer w.close()
-		w.Group.Wait()
-	}()
+	return r
 }
