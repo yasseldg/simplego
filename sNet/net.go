@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/yasseldg/simplego/sConv"
 	"github.com/yasseldg/simplego/sEnv"
+	"github.com/yasseldg/simplego/sJson"
 	"github.com/yasseldg/simplego/sLog"
 )
 
@@ -67,6 +69,13 @@ func (c *Config) GetUrl() string {
 	return fmt.Sprintf("http://%s", url)
 }
 
+func (c *Config) GetHandlerPath(handler string) string {
+	if len(c.PathPrefix) > 0 {
+		return fmt.Sprintf("/%s/%s", c.PathPrefix, handler)
+	}
+	return fmt.Sprintf("/%s", handler)
+}
+
 func (c *Config) Call(method string, params string, body io.Reader) ([]byte, error) {
 
 	timeout := time.Duration(5 * time.Second)
@@ -106,7 +115,15 @@ func (c *Config) Call(method string, params string, body io.Reader) ([]byte, err
 	if err != nil {
 		return nil, fmt.Errorf("Call: ioutil.ReadAll(resp.Body): %s ", err)
 	}
-	sLog.Debug("Call: body: %s ", string(resp_body))
+	sLog.Debug("Call: resp_body: %s ", string(resp_body))
 
 	return resp_body, nil
+}
+
+func (c *Config) SendObj(method string, body_obj any) ([]byte, error) {
+	body_str, err := sJson.ToJson(body_obj)
+	if err != nil {
+		return nil, fmt.Errorf("json.Marshal(body): %s", err)
+	}
+	return c.Call(method, "obj", strings.NewReader(body_str))
 }
