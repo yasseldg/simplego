@@ -7,7 +7,7 @@ import (
 	"github.com/yasseldg/simplego/sEnv"
 	"github.com/yasseldg/simplego/sLog"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 // Environment Variables
@@ -19,7 +19,7 @@ type Bot struct {
 	Bot      *tgbotapi.BotAPI
 	ChatId   int64
 	Token    string
-	ReadFunc func(update *tgbotapi.Update) string
+	ReadFunc ReadFunc
 }
 
 type ReadFunc func(update *tgbotapi.Update) string
@@ -70,11 +70,7 @@ func (t *Bot) read() {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
-	updates, err := t.Bot.GetUpdatesChan(u)
-	if err != nil {
-		sLog.Error("TelegramBot.read: %s", err.Error())
-		return
-	}
+	updates := t.Bot.GetUpdatesChan(u)
 	for update := range updates {
 		str := t.ReadFunc(&update)
 		if len(str) > 0 {
