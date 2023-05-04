@@ -3,6 +3,7 @@ module github.com/yasseldg/simplego
 go 1.19
 
 require (
+	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
 	github.com/yasseldg/mgm/v4 v4.0.4
 	go.mongodb.org/mongo-driver v1.11.4
 	go.uber.org/zap v1.24.0
@@ -10,6 +11,7 @@ require (
 	golang.org/x/net v0.9.0
 	gonum.org/v1/gonum v0.12.0
 	gonum.org/v1/plot v0.12.0
+	google.golang.org/grpc v1.54.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -21,6 +23,7 @@ require (
 	github.com/go-latex/latex v0.0.0-20230307184459-12ec69307ad9 // indirect
 	github.com/go-pdf/fpdf v0.7.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
+	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/klauspost/compress v1.16.4 // indirect
@@ -28,6 +31,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/testify v1.8.2 // indirect
+	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
@@ -37,5 +41,8 @@ require (
 	golang.org/x/crypto v0.8.0 // indirect
 	golang.org/x/image v0.7.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
+	golang.org/x/sys v0.7.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
+	google.golang.org/genproto v0.0.0-20230110181048-76db0878b65f // indirect
+	google.golang.org/protobuf v1.28.1 // indirect
 )
