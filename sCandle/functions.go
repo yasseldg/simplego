@@ -52,22 +52,3 @@ func NextTs(ts int64, interval string) int64 {
 	diff := ts % intSec
 	return ts - diff + intSec
 }
-
-func GetIntervalGraphql(interval string) string {
-	switch interval {
-	case "candle1m", "1m":
-		return "M1"
-	case "candle5m", "5m":
-		return "M5"
-	case "candle15m", "15m":
-		return "M15"
-	case "candle1H", "1H":
-		return "H1"
-	case "candle4H", "4H":
-		return "H4"
-	case "candle1D", "1Dutc":
-		return "D"
-	default:
-		return ""
-	}
-}
