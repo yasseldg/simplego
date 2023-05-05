@@ -16,10 +16,10 @@ import (
 // ** TelegramChatID int64
 
 type Bot struct {
-	Bot      *tgbotapi.BotAPI
-	ChatId   int64
-	Token    string
-	ReadFunc ReadFunc
+	Bot    *tgbotapi.BotAPI
+	ChatId int64
+	Token  string
+	Func   ReadFunc
 }
 
 type ReadFunc func(update *tgbotapi.Update) string
@@ -32,17 +32,10 @@ func NewBot(token string, chat_id int64, read_func ReadFunc) *Bot {
 		token = sEnv.Get("TelegramBotToken", "")
 	}
 	if read_func == nil {
-		read_func = defaultRead
+		read_func = defaultFunc
 	}
 	sLog.Debug("NewTelegramBot: chat_id: %d, read_func: %v", chat_id, read_func)
-	return &Bot{ChatId: chat_id, Token: token, ReadFunc: read_func}
-}
-
-func defaultRead(update *tgbotapi.Update) string {
-	if update.Message == nil {
-		return ""
-	}
-	return fmt.Sprintf("%s: %s", update.Message.From.UserName, update.Message.Text)
+	return &Bot{ChatId: chat_id, Token: token, Func: read_func}
 }
 
 func (t *Bot) Start() {
@@ -59,6 +52,19 @@ func (t *Bot) Start() {
 	go t.read()
 }
 
+func (t *Bot) Send(msg string) {
+	if t.Bot == nil {
+		sLog.Error("TelegramBot.Send: bot is nil")
+		return
+	}
+
+	newMsg := tgbotapi.NewMessage(t.ChatId, msg)
+	_, err := t.Bot.Send(newMsg)
+	if err != nil {
+		sLog.Error("TelegramBot.Send: %s", err)
+	}
+}
+
 func (t *Bot) read() {
 	if t.Bot == nil {
 		sLog.Error("TelegramBot.read: bot is nil")
@@ -72,22 +78,16 @@ func (t *Bot) read() {
 
 	updates := t.Bot.GetUpdatesChan(u)
 	for update := range updates {
-		str := t.ReadFunc(&update)
+		str := t.Func(&update)
 		if len(str) > 0 {
 			t.Send(str)
 		}
 	}
 }
 
-func (t *Bot) Send(msg string) {
-	if t.Bot == nil {
-		sLog.Error("TelegramBot.Send: bot is nil")
-		return
+func defaultFunc(update *tgbotapi.Update) string {
+	if update.Message == nil {
+		return ""
 	}
-
-	newMsg := tgbotapi.NewMessage(t.ChatId, msg)
-	_, err := t.Bot.Send(newMsg)
-	if err != nil {
-		sLog.Error("TelegramBot.Send: %s", err)
-	}
+	return fmt.Sprintf("%s: %s", update.Message.From.UserName, update.Message.Text)
 }
