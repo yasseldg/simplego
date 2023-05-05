@@ -14,6 +14,17 @@ const (
 	Interval_DEFAULT = Interval("DEFAULT")
 )
 
+func (i Interval) IsDefault() bool {
+	return i == Interval_DEFAULT
+}
+
+func (i Interval) String() string {
+	if i.IsDefault() {
+		return ""
+	}
+	return string(i)
+}
+
 func GetInterval(interval string) Interval {
 	switch interval {
 	case "1m":
