@@ -36,6 +36,7 @@ func Verify(candles Candles, interval int64) []error {
 		if err != nil {
 			errs = append(errs, err)
 		}
+		prev = candle
 	}
 	return errs
 }
