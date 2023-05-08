@@ -3,14 +3,13 @@ package sDate
 import (
 	"time"
 
-	"github.com/yasseldg/simplego/sCandle"
 	"github.com/yasseldg/simplego/sLog"
 )
 
-func NextStop(ts int64, interval string) int64 {
-	intSec := sCandle.GetIntervalSeconds(interval)
-	diff := ts % intSec
-	return ts - diff + intSec - intSec/10
+// NextStop, ts and interval in seconds
+func NextStop(ts, interval int64) int64 {
+	diff := ts % interval
+	return ts - diff + interval - interval/10
 }
 
 func Stop(stop time.Time) bool {
