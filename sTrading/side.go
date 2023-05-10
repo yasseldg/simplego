@@ -8,6 +8,9 @@ const (
 	// Side
 	Buy  = 1
 	Sell = 2
+
+	BuyStr  = "Buy"
+	SellStr = "Sell"
 )
 
 func GetSide(s string) int {
@@ -32,9 +35,9 @@ func IsSell(s string) bool {
 func GetSideStr(s int) string {
 	switch s {
 	case Buy:
-		return "Buy"
+		return BuyStr
 	case Sell:
-		return "Sell"
+		return SellStr
 	default:
 		return ""
 	}

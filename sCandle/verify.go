@@ -116,7 +116,9 @@ func candlesFromClose(tsFrom, tsTo, interval int64, price float64) Candles {
 }
 
 func fixCandle(candle *Candle, prevClosePrice float64) {
-	candle.Open = prevClosePrice
+	if prevClosePrice > 0 {
+		candle.Open = prevClosePrice
+	}
 	if candle.High < candle.Open {
 		candle.High = candle.Open
 	}
