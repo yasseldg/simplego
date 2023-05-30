@@ -27,19 +27,19 @@ func (i Interval) String() string {
 
 func GetInterval(interval string) Interval {
 	switch interval {
-	case "1m":
+	case "M1", "candle1m", "1m", "1", "1min":
 		return Interval_1m
-	case "5m":
+	case "M5", "candle5m", "5m", "5", "5min":
 		return Interval_5m
-	case "15m":
+	case "M15", "candle15m", "15m", "15", "15min":
 		return Interval_15m
-	case "1h":
+	case "H1", "candle1H", "1H", "60", "1h":
 		return Interval_1h
-	case "4h":
+	case "H4", "candle4H", "4H", "240", "4h":
 		return Interval_4h
-	case "D":
+	case "D", "candle1D", "1Dutc", "1440", "1d":
 		return Interval_D
-	case "W":
+	case "W", "candle1W", "1W", "Week", "10080", "1w":
 		return Interval_W
 	default:
 		return Interval_DEFAULT

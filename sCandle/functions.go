@@ -1,24 +1,46 @@
 package sCandle
 
+import (
+	"strings"
+
+	"github.com/yasseldg/simplego/sConv"
+)
+
 func GetIntervalMinutes(interval string) int64 {
-	switch interval {
-	case "M1", "candle1m", "1m", "1", "1min":
-		return 1
-	case "M5", "candle5m", "5m", "5", "5min":
-		return 5
-	case "M15", "candle15m", "15m", "15", "15min":
-		return 15
-	case "H1", "candle1H", "1H", "60", "1h":
-		return 60
-	case "H4", "candle4H", "4H", "240", "4h":
-		return 240
-	case "D", "candle1D", "1Dutc", "1440", "1d":
-		return 1440
-	case "W":
-		return 10080
+	min := int64(0)
+	interval, mult := getIntervalMult(interval)
+	switch GetInterval(interval) {
+	case Interval_1m:
+		min = 1
+	case Interval_5m:
+		min = 5
+	case Interval_15m:
+		min = 15
+	case Interval_1h:
+		min = 60
+	case Interval_4h:
+		min = 240
+	case Interval_D:
+		min = 1440
+	case Interval_W:
+		min = 10080
 	default:
-		return 0
+		min = 0
 	}
+	return min * int64(mult)
+}
+
+func getIntervalMult(interval string) (string, int) {
+	mult := 1
+	strs := strings.Split(interval, "*")
+	if len(strs) > 1 {
+		interval = strs[0]
+		mult_2 := sConv.GetInt(strs[1])
+		if mult_2 > mult {
+			mult = mult_2
+		}
+	}
+	return interval, mult
 }
 
 func GetIntervalSeconds(interval string) int64 {
