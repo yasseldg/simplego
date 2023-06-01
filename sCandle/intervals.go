@@ -10,6 +10,7 @@ const (
 	Interval_4h  = Interval("4h")
 	Interval_D   = Interval("D")
 	Interval_W   = Interval("W")
+	Interval_M   = Interval("M")
 
 	Interval_DEFAULT = Interval("DEFAULT")
 )
@@ -37,10 +38,12 @@ func GetInterval(interval string) Interval {
 		return Interval_1h
 	case "H4", "candle4H", "4H", "240", "4h":
 		return Interval_4h
-	case "D", "candle1D", "1Dutc", "1440", "1d":
+	case "D", "candle1D", "1D", "1Dutc", "1440", "1d":
 		return Interval_D
 	case "W", "candle1W", "1W", "Week", "10080", "1w":
 		return Interval_W
+	case "M", "Month":
+		return Interval_M
 	default:
 		return Interval_DEFAULT
 	}

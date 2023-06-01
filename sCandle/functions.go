@@ -2,6 +2,7 @@ package sCandle
 
 import (
 	"strings"
+	"time"
 
 	"github.com/yasseldg/simplego/sConv"
 )
@@ -63,6 +64,9 @@ func IsClosingMilli(ts int64, interval string) bool {
 
 // PrevTs, ts is in seconds
 func PrevTs(ts int64, interval string) int64 {
+	if GetInterval(interval) == Interval_M {
+		return startOfMonth(ts)
+	}
 	intSec := GetIntervalSeconds(interval)
 	diff := ts % intSec
 	return ts - diff
@@ -70,7 +74,31 @@ func PrevTs(ts int64, interval string) int64 {
 
 // NextTs, ts is in seconds
 func NextTs(ts int64, interval string) int64 {
+	if GetInterval(interval) == Interval_M {
+		return startOfNextMonth(ts)
+	}
 	intSec := GetIntervalSeconds(interval)
 	diff := ts % intSec
 	return ts - diff + intSec
+}
+
+func IsSameMonth(ts1, ts2 int64) bool {
+	t1 := time.Unix(ts1, 0).UTC()
+	t2 := time.Unix(ts2, 0).UTC()
+	return t1.Year() == t2.Year() && t1.Month() == t2.Month()
+}
+
+func startOfMonth(ts int64) int64 {
+	t := time.Unix(ts, 0).UTC()
+	return time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC).Unix()
+}
+
+func startOfNextMonth(ts int64) int64 {
+	t := time.Unix(ts, 0).UTC()
+	y, m, _ := t.Date()
+	if m == 12 {
+		y++
+		m = 0
+	}
+	return time.Date(y, m+1, 1, 0, 0, 0, 0, time.UTC).Unix()
 }

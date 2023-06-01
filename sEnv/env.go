@@ -11,7 +11,6 @@ import (
 
 // Get
 func Get(env_name, defaults string) string {
-
 	env, ok := os.LookupEnv(env_name)
 	if ok {
 		return env
@@ -21,9 +20,7 @@ func Get(env_name, defaults string) string {
 
 // GetSlice
 func GetSlice(env_name string, defaults ...string) []string {
-
 	string_values := Get(env_name, "")
-
 	if len(string_values) > 0 {
 		return sStr.SplitString(string_values, ",")
 	}
@@ -32,7 +29,6 @@ func GetSlice(env_name string, defaults ...string) []string {
 
 // GetSliceInt
 func GetSliceInt(env_name string, defaults []int) (res []int) {
-
 	values := GetSlice(env_name)
 	if len(values) > 0 {
 		for _, v := range values {
@@ -45,7 +41,6 @@ func GetSliceInt(env_name string, defaults []int) (res []int) {
 
 // LoadYaml
 func LoadYaml(file_path string, obj interface{}) error {
-
 	data, err := os.ReadFile(file_path)
 	if err != nil {
 		return err
