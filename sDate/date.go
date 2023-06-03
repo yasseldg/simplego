@@ -14,22 +14,22 @@ func init() {
 	DateSeparator = sEnv.Get("DateSeparator", DateSeparator)
 }
 
-func format(t time.Time, prec int64, separator string) string {
+func format(t time.Time, prec int64, separator string) (string, int64) {
 	if len(separator) == 0 {
 		separator = DateSeparator
 	}
 	df := fmt.Sprintf("2006%s01%s02", separator, separator)
 	switch prec {
 	case 1:
-		return t.Format(df)
+		return t.Format(df), t.Unix()
 	case 2:
-		return t.Format(fmt.Sprintf("%s 15:04", df))
+		return t.Format(fmt.Sprintf("%s 15:04", df)), t.Unix()
 	case 4:
-		return t.Format(fmt.Sprintf("%s 15:04:05.000", df))
+		return t.Format(fmt.Sprintf("%s 15:04:05.000", df)), t.UnixMilli()
 	case 5:
-		return t.Format(fmt.Sprintf("%s 15:04:05.000000", df))
+		return t.Format(fmt.Sprintf("%s 15:04:05.000000", df)), t.UnixMicro()
 	default:
-		return t.Format(fmt.Sprintf("%s 15:04:05", df))
+		return t.Format(fmt.Sprintf("%s 15:04:05", df)), t.Unix()
 	}
 }
 
@@ -42,7 +42,8 @@ func FormatDSep(value any, prec int64, separator string) string {
 	if err != nil {
 		return fmt.Sprintf("%v", value)
 	}
-	return format(t, prec, separator)
+	s, _ := format(t, prec, separator)
+	return s
 }
 
 func ForLog(value any, prec int64) string {
@@ -50,7 +51,8 @@ func ForLog(value any, prec int64) string {
 	if err != nil {
 		return fmt.Sprintf("%v", value)
 	}
-	return fmt.Sprintf("%d ( %s )", t.Unix(), format(t, prec, ""))
+	s, d := format(t, prec, "")
+	return fmt.Sprintf("%d ( %s )", d, s)
 }
 
 func ForWeb(value any, prec int64) string {
@@ -58,7 +60,8 @@ func ForWeb(value any, prec int64) string {
 	if err != nil {
 		return fmt.Sprintf("%v", value)
 	}
-	return fmt.Sprintf("%d <br> %s", t.Unix(), format(t, prec, ""))
+	s, d := format(t, prec, "")
+	return fmt.Sprintf("%d <br> %s", d, s)
 }
 
 func ToTime(value any) (time.Time, error) {
