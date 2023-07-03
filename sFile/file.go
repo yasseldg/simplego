@@ -161,11 +161,30 @@ func decompressZipFile(file *zip.File, dir_path string) error {
 }
 
 func DeletePath(file_path string) error {
-	err := os.Remove(file_path)
+	exist, err := ExistingPath(file_path)
+	if err != nil {
+		return err
+	}
+	if !exist {
+		return nil
+	}
+
+	err = os.Remove(file_path)
 	if err != nil {
 		err = fmt.Errorf("os.Remove( %s ): %s", file_path, err)
 	}
 	return err
+}
+
+func ExistingPath(file_path string) (bool, error) {
+	_, err := os.Stat(file_path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
 }
 
 func CreateErrorDir(file_path string) (dir_path string, err error) {
