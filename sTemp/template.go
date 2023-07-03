@@ -53,6 +53,10 @@ func TemplateFuncs(name ...string) template.FuncMap {
 			return sDate.ForWeb(value, prec)
 		},
 
+		"FormatDform": func(value any, prec int64) string {
+			return sDate.FormatDSep(value, prec, "-")
+		},
+
 		"GetValues": func(str, vt string) []string {
 			return sConv.GetValues(str, vt)
 		},
