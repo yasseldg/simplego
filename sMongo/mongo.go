@@ -85,6 +85,18 @@ func (c *Collection) Clone(name string) *Collection {
 	return &clone
 }
 
+type Index struct {
+	Fields interface{}
+	Unique bool
+}
+type Indexes []Index
+
+func (c *Collection) CreateIndexes(indexes Indexes) {
+	for _, index := range indexes {
+		c.CreateIndex(index.Fields, index.Unique)
+	}
+}
+
 // CreateIndex, create an index for a specific field in a collectionName
 func (c *Collection) CreateIndex(fields interface{}, unique bool) {
 	if c.Connection.Environment == "write" {
