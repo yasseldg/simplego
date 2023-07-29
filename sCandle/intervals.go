@@ -26,6 +26,55 @@ func (i Interval) String() string {
 	return string(i)
 }
 
+func (i Interval) Seconds() int64 {
+	if i.IsDefault() {
+		return 0
+	}
+	return GetIntervalSeconds(i.String())
+}
+
+func (i Interval) Minutes() int64 {
+	if i.IsDefault() {
+		return 0
+	}
+	return GetIntervalMinutes(i.String())
+}
+
+func (i Interval) SecondsMilli() int64 {
+	if i.IsDefault() {
+		return 0
+	}
+	return GetIntervalSecondsMilli(i.String())
+}
+
+func (i Interval) IsClosing(ts int64) bool {
+	if i.IsDefault() {
+		return false
+	}
+	return IsClosing(ts, i.String())
+}
+
+func (i Interval) IsClosingMilli(ts int64) bool {
+	if i.IsDefault() {
+		return false
+	}
+	return IsClosingMilli(ts, i.String())
+}
+
+func (i Interval) Prev(ts int64) int64 {
+	if i.IsDefault() {
+		return 0
+	}
+	return PrevTs(ts, i.String())
+}
+
+func (i Interval) Next(ts int64) int64 {
+	if i.IsDefault() {
+		return 0
+	}
+	return NextTs(ts, i.String())
+}
+
 func GetInterval(interval string) Interval {
 	switch interval {
 	case "M1", "candle1m", "1m", "1", "1min":
