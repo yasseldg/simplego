@@ -133,16 +133,16 @@ func CalcProfitOut(pricesIn, sizes []float64, stopLossPercentage, balance float6
 	return
 }
 
-func CalcProfitAndLoss(pricesIn, pricesOut, sizes []float64, side int) (totalReturn float64, slice []float64) {
+func CalcProfitAndLoss(pricesIn, pricesOut, sizes []float64, side Side) (totalReturn float64, slice []float64) {
 
 	switch side {
-	case Sell:
+	case Side_Sell:
 		for i := range pricesIn {
 			pnl := (pricesIn[i] - pricesOut[i]) * sizes[i] / pricesIn[i]
 			slice = append(slice, pnl)
 			totalReturn += pnl
 		}
-	case Buy:
+	case Side_Buy:
 		for i := range pricesIn {
 			pnl := (pricesOut[i] - pricesIn[i]) * sizes[i] / pricesIn[i]
 			slice = append(slice, pnl)
