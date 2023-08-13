@@ -24,16 +24,28 @@ type Positions []*Position
 
 // The file_path is the path to the file where the positions will be exported.
 // The file will be deleted if it exists.
-func (bp BacktestPositions) Export(file_path string) {
+func (bp BacktestPositions) Export(file_path string) error {
 	err := sFile.DeletePath(file_path)
 	if err != nil {
 		sLog.Error("sFile.Delete(): %s", err)
-		return
+		return err
 	}
 
 	err = sJson.Export(file_path, bp)
 	if err != nil {
 		sLog.Error("sJson.Export(): %s", err)
-		return
+		return err
+	}
+	return nil
+}
+
+func (s Side) PositionSide() int {
+	switch s {
+	case Side_Buy:
+		return 0
+	case Side_Sell:
+		return 1
+	default:
+		return -1
 	}
 }
