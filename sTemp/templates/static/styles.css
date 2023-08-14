@@ -1,0 +1,204 @@
+html {
+    --blue-9: #3ea6ff;
+    --blue-10: #61b6ff;
+    --grey-9: #f3f3f3;
+}
+
+:root {
+    --color-dark: #303841;
+    --color-dark-2: #3A4750;
+    --color-primary: #F6C90E;
+    --color-ligth: #EEEEEE;
+
+    --text-color-light: black;
+    --background-color-light: white;
+    --link-color-light: var(--blue-9);
+    --link-hover-color-light: rgb(100, 150, 100);
+
+    --text-color-dark: var(--grey-9);
+    --background-color-dark: var(--color-dark);
+    --link-color-dark: var(--blue-9);
+    --link-hover-color-dark: var(--grey-9);
+}
+
+html[data-theme='light'] {
+    --text-color: var(--text-color-light);
+    --background-color: var(--background-color-light);
+    --link-color: var(--link-color-light);
+    --link-hover-color: var(--link-hover-color-light);
+}
+
+html[data-theme='dark'] {
+    --text-color: var(--text-color-dark);
+    --background-color: var(--background-color-dark);
+    --link-color: var(--link-color-dark);
+    --link-hover-color: var(--link-hover-color-dark);
+}
+
+body {
+    color: var(--text-color);
+    background-color: var(--background-color);
+    font-family: sans-serif;
+}
+
+html[data-theme='dark'] a:link,
+html[data-theme='dark'] a:visited {
+    color: var(--color-primary);
+    transition: color 0.1s ease-in-out;
+}
+
+html[data-theme='dark'] a:hover {
+    color: var(--color-ligth);
+}
+
+a:link,
+a:visited {
+    color: var(--link-color);
+    transition: color 0.1s ease-in-out;
+}
+
+a:hover {
+    color: var(--link-hover-color);
+}
+
+h1 {
+    font-size: 1.75rem;
+    font-family: sans-serif;
+}
+
+table {
+    border-spacing: 10px;
+    border-collapse: collapse;
+    width: 100%;
+    position: relative;
+}
+
+th,
+td {
+    font-family: sans-serif;
+    text-align: center;
+    font-size: 13px;
+    padding: 10px;
+}
+
+th {
+    background-color: var(--color-dark-2);
+    color: white;
+    position: sticky;
+    top: 0;
+    font-size: 10px;
+}
+
+tr:hover {
+    background-color: #EEEEEE;
+}
+
+html[data-theme='dark'] th {
+    background-color: var(--color-primary);
+    color: var(--color-dark);
+}
+
+html[data-theme='dark'] tr:hover {
+    background-color: var(--color-dark-2);
+}
+
+ul {
+    list-style: none;
+    text-align: left;
+}
+
+th th.align-right {
+    text-align: right;
+}
+
+.form-inputs-container {
+    margin: .75rem 0;
+}
+
+.form-inputs-container label {
+    margin: 0 .25rem;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+button {
+    background-color: var(--color-dark-2);
+    color: var(--color-ligth);
+    border: 0;
+    border-radius: .15rem;
+    cursor: pointer;
+    padding: .25rem .5rem;
+    transition: all .5s;
+}
+
+button:hover {
+    background-color: var(--color-primary);
+    color: var(--color-dark-2);
+}
+
+html[data-theme='dark'] button {
+    background-color: var(--color-primary);
+    color: var(--color-dark);
+    border: 0;
+    border-radius: .15rem;
+    cursor: pointer;
+    padding: .25rem .5rem;
+    transition: all .5s;
+}
+
+html[data-theme='dark'] button:hover {
+    background-color: var(--color-ligth);
+    color: var(--color-dark-2);
+}
+
+.button-link {
+    background-color: var(--color-dark-2) !important;
+    color: var(--color-ligth) !important;
+    text-decoration: none !important;
+    border: 0;
+    border-radius: .15rem;
+    cursor: pointer;
+    padding: .25rem .5rem;
+    transition: all .5s;
+}
+
+.button-link:hover {
+    background-color: var(--color-primary) !important;
+    color: var(--color-dark-2) !important;
+}
+
+html[data-theme='dark'] .button-link {
+    background-color: var(--color-primary) !important;
+    color: var(--color-dark-2) !important;
+    text-decoration: none !important;
+    border: 0;
+    border-radius: .15rem;
+    cursor: pointer;
+    padding: .25rem .5rem;
+    transition: all .5s;
+}
+
+html[data-theme='dark'] .button-link:hover {
+    background-color: var(--color-ligth) !important;
+    color: var(--color-dark-2) !important;
+}
+
+/*  Messages  */
+.error {
+    color: red;
+    font-weight: bold;
+}
+
+.info {
+    color: green;
+    font-weight: bold;
+}
+
+.warn {
+    color: orange;
+    font-weight: bold;
+}
+
+.theme-switch.text-right {
+    text-align: right;
+}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/{{.PathPrefix}}/static/styles.css">
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+            const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : 'light';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+
+            if (currentTheme === 'dark') {
+                toggleSwitch.checked = true;
+            }
+
+            toggleSwitch.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    {{ template "header" . }}
+    <main>
+        {{ template "message" .Messages }}
+
+        {{ template "content" . }}
+    </main>
+    {{ template "footer" }}
+</body>
+</html>

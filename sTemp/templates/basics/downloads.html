@@ -1,0 +1,9 @@
+{{ define "downloads" }}
+    <div>
+        <ul>
+            {{ range . }}
+                <li><a href="{{ .Url }}" download="{{ .Name }}">{{ .Name }}</a></li>
+            {{ end }}
+        </ul>
+    </div>
+{{ end }}

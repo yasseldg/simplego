@@ -1,72 +1,38 @@
 package sTemp
 
 import (
-	"fmt"
+	"net/http"
+	"path/filepath"
 	"text/template"
 
-	"github.com/yasseldg/simplego/sConv"
-	"github.com/yasseldg/simplego/sDate"
+	"github.com/yasseldg/simplego/sLog"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
-func TemplateFuncs(name ...string) template.FuncMap {
+type Paths []string
+type Data bson.M
 
-	return template.FuncMap{
-		"FormatF": func(f float64, dec string) string {
-			return FormatF(f, dec)
-		},
-
-		"MultF": func(v1, v2 float64, dec string) string {
-			prec := "%." + dec + "f"
-			return fmt.Sprintf(prec, (v1 * v2))
-		},
-
-		"MultI": func(v1, v2 int64) string {
-
-			return fmt.Sprintf("%d", (v1 * v2))
-		},
-
-		"RestF": func(v1, v2 int) int {
-			return v1 - v2
-		},
-
-		"RestI": func(v1, v2 int) int {
-			return v1 % v2
-		},
-
-		"DivI": func(v1, v2 int) int {
-			return v1 / v2
-		},
-
-		"SumI": func(v1, v2 int) int {
-			return v1 + v2
-		},
-
-		"SumI64": func(v1, v2 int64) int64 {
-			return v1 + v2
-		},
-
-		"GetI": func(s string) int {
-			return sConv.GetInt(s)
-		},
-
-		"FormatD": func(value any, prec int64) string {
-			return sDate.ForWeb(value, prec)
-		},
-
-		"FormatDform": func(value any, prec int64) string {
-			return sDate.FormatDSep(value, prec, "-")
-		},
-
-		"GetValues": func(str, vt string) []string {
-			return sConv.GetValues(str, vt)
-		},
-
-		"GetRangeLimits": func(str, vt string) []sConv.ExtValues {
-			return sConv.GetRangeLimits(str, vt)
-		}}
+func Basics(dir_path string) Paths {
+	return Paths{
+		filepath.Join(dir_path, "templates/basics/header.html"), filepath.Join(dir_path, "templates/basics/message.html"),
+		filepath.Join(dir_path, "templates/basics/footer.html"), filepath.Join(dir_path, "templates/basics/layout.html")}
 }
 
-func FormatF(f float64, dec string) string {
-	prec := "%." + dec + "f"
-	return fmt.Sprintf(prec, f)
+func Layout(w http.ResponseWriter, dir_temp_paths, path_prefix string, msg FlashMessages, temp_paths Paths, data Data) error {
+	tmpl, err := template.New("layout.html").Funcs(Functions()).ParseFiles(append(Basics(dir_temp_paths), temp_paths...)...)
+	if err != nil {
+		sLog.Error(err.Error())
+		return err
+	}
+	sLog.Debug("templates: %v", tmpl.DefinedTemplates())
+
+	data["Messages"] = msg
+	data["PathPrefix"] = path_prefix
+
+	err = tmpl.ExecuteTemplate(w, "layout.html", data)
+	if err != nil {
+		sLog.Error(err.Error())
+		return err
+	}
+	return nil
 }

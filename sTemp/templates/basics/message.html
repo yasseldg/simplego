@@ -1,0 +1,5 @@
+{{ define "message" }}
+    {{ range . }}
+        <div style="text-align: center;" class="{{ .Type }}">{{ .Message }}</div>
+    {{ end }}
+{{ end }}
