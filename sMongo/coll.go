@@ -14,6 +14,10 @@ type CollManager struct {
 	pipeline mongo.Pipeline
 }
 
+func Coll(env, connection, database, collection, interval string) *CollManager {
+	return &CollManager{Collection: *New(env, connection, database, collection, interval)}
+}
+
 func (c *CollManager) Filters(f Filters) *CollManager {
 	c.filters = f
 	return c
