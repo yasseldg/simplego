@@ -8,6 +8,8 @@ type Sorts struct {
 	Fields bson.D
 }
 
+func Sort() *Sorts { return &Sorts{Fields: bson.D{}} }
+
 // Append agrega un nuevo campo de ordenación con su dirección.
 func (s *Sorts) Append(key string, value int) *Sorts {
 	s.Fields = append(s.Fields, bson.E{Key: key, Value: value})

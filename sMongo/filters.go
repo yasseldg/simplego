@@ -9,6 +9,8 @@ type Filters struct {
 	Fields bson.D
 }
 
+func Filter() *Filters { return &Filters{Fields: bson.D{}} }
+
 // Append adds a new filter field.
 func (f *Filters) Append(key string, value interface{}) *Filters {
 	f.Fields = append(f.Fields, bson.E{Key: key, Value: value})
