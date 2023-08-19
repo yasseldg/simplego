@@ -36,6 +36,11 @@ func (f *Filters) Ts(ts_from, ts_to int64) *Filters {
 	return f.TsField(ts_from, ts_to, "ts")
 }
 
+func (f *Filters) TsIn(tss ...int64) *Filters {
+	f.Int64_in("ts", tss)
+	return f
+}
+
 // string
 func (f *Filters) String_in(field string, values []string) *Filters {
 	return f.Append(field, bson.D{{"$in", values}})

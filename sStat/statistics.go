@@ -1,6 +1,7 @@
 package sStat
 
 import (
+	"math"
 	"math/rand"
 	"time"
 
@@ -43,4 +44,11 @@ func UniformDist(min float64) float64 {
 		}
 	}
 	return min
+}
+
+func ValidFloat64(f float64) float64 {
+	if math.IsNaN(f) || math.IsInf(f, 0) {
+		return 0
+	}
+	return f
 }
