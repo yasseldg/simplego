@@ -82,6 +82,7 @@ func DecompressGzip(file_path string) string {
 		sLog.Error("DecompressGzip: os.Open( %s ): %s", file_path, err)
 		return ""
 	}
+	defer gzipfile.Close()
 
 	reader, err := gzip.NewReader(gzipfile)
 	if err != nil {
@@ -103,6 +104,7 @@ func DecompressGzip(file_path string) string {
 		sLog.Error("DecompressGzip: io.Copy(writer, reader): %s", err)
 		return ""
 	}
+
 	return new_path
 }
 
@@ -127,15 +129,14 @@ func DecompressZip(file_path, dir_path string) error {
 func decompressZipFile(file *zip.File, dir_path string) error {
 	filePath := filepath.Join(dir_path, file.Name)
 
-	if file.FileInfo().IsDir() {
-		os.MkdirAll(filePath, os.ModePerm)
-		return nil
-	}
-
 	err := os.MkdirAll(filepath.Dir(filePath), os.ModePerm)
 	if err != nil {
 		sLog.Error("decompressZipFile: os.MkdirAll(filepath.Dir( %s ): %s", filePath, err)
 		return err
+	}
+
+	if file.FileInfo().IsDir() {
+		return nil
 	}
 
 	outputFile, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
@@ -147,7 +148,7 @@ func decompressZipFile(file *zip.File, dir_path string) error {
 
 	zipFile, err := file.Open()
 	if err != nil {
-		sLog.Error("decompressZipFile: %s  ..  file.Open(): %s", file.Name, err)
+		sLog.Error("decompressZipFile: file.Open(): %s", err)
 		return err
 	}
 	defer zipFile.Close()
@@ -200,19 +201,18 @@ func CreateErrorDir(file_path string) (dir_path string, err error) {
 
 func GetDir(file_path string) (err error) {
 	_, err = os.Stat(file_path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			// File or directory does not exist
-			err = os.MkdirAll(file_path, mode(0755, os.ModeDir))
-			if err != nil {
-				sLog.Error("GetDir: os.MkdirAll: %s", err)
-			}
-		} else {
-			// Some other error. The file may or may not exist
-			sLog.Error("GetDir: os.Stat( %q ): %s", file_path, err)
-		}
+	if err == nil {
+		// Directory exists
+		return nil
 	}
-	return
+
+	if os.IsNotExist(err) {
+		// File or directory does not exist
+		return os.MkdirAll(file_path, mode(0755, os.ModeDir))
+	}
+
+	sLog.Error("GetDir: os.Stat( %q ): %s", file_path, err)
+	return err
 }
 
 // mode returns the file mode masked by the umask
