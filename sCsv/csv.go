@@ -81,7 +81,7 @@ func importGz(file_path string) ([][]string, error) {
 	return Import(new_file_path)
 }
 
-type SaveFunc func(objs []mgm.Model, coll sMongo.Collection) (err error)
+type SaveFunc func(objs []mgm.Model, coll sMongo.Collection) int
 type ObjFunc func(data []string) (obj mgm.Model)
 type ImportFunc func(file_path string, obj_func ObjFunc, save_func SaveFunc, batch_size int, coll sMongo.Collection) (err error)
 
@@ -136,7 +136,7 @@ func importSaveCsv(file_path string, obj_func ObjFunc, save_func SaveFunc, batch
 	defer f.Close()
 
 	reader := csv.NewReader(f)
-
+	c := 0
 	for {
 		batch, err := readBatch(reader, batch_size)
 		if err != nil {
@@ -150,17 +150,18 @@ func importSaveCsv(file_path string, obj_func ObjFunc, save_func SaveFunc, batch
 
 		objs := processBatch(batch, obj_func)
 		if objs == nil {
-			return fmt.Errorf("Import: processBatch(batch, obj_func)")
+			sLog.Error("Import: processBatch(batch, obj_func): objs == nil")
+			continue
 		}
 
-		err = save_func(objs, coll)
-		if err != nil {
+		errs := save_func(objs, coll)
+		if errs > 0 {
 			sLog.Error("Import: save_func(objs): %s", err)
-			return err
 		}
+		c += len(objs)
 	}
 
-	sLog.Info("Import: successful import of ( %s )", file_path)
+	sLog.Info("Import: successful import of %d lines from ( %s )", c, file_path)
 	return nil
 }
 
