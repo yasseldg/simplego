@@ -91,6 +91,16 @@ func SortF(values []float64, order int) {
 	}
 }
 
+// SortFloat64, order "1=asc","-1=desc"
+func SortFloat64(values []float64, order int) {
+	switch order {
+	case 1:
+		sort.Sort(sort.Float64Slice(values))
+	case -1:
+		sort.Sort(sort.Reverse(sort.Float64Slice(values)))
+	}
+}
+
 // TrimF, trim greater or lesser, order "0=asc: greater","1=desc: lesser"
 func TrimF(values []float64, keepOut float64, order int) []float64 {
 	// log.Printf("TrimSliceFloat: keepOut: %.2f  --  values: %v", keepOut, values)

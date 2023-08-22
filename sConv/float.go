@@ -164,6 +164,19 @@ func CompareTruncFloat(v1, v2 float64, prec int) float64 {
 	return GetTruncFloat(v1, prec) - GetTruncFloat(v2, prec)
 }
 
+func CompareFloats(v1, v2 float64, prec int) int {
+	epsilon := 1.0 / math.Pow(10.0, float64(prec))
+
+	diff := v1 - v2
+	if math.Abs(diff) < epsilon {
+		return 0 // v1 == v2 (within precision)
+	}
+	if diff > 0 {
+		return 1 // v1 > v2
+	}
+	return -1 // v1 < v2
+}
+
 func GetDiffPercent(fromValue, toValue float64) float64 {
 
 	return ((toValue / fromValue) - 1) * 100
