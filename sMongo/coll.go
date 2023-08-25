@@ -14,8 +14,9 @@ type CollManager struct {
 	pipeline mongo.Pipeline
 }
 
-func Coll(env, connection, database, collection, interval string) *CollManager {
-	return &CollManager{Collection: *New(env, connection, database, collection, interval)}
+func Coll(env, connection, database, collection, interval string) CollManager {
+	return CollManager{Collection: *New(env, connection, database, collection, interval),
+		filters: Filters{}, sorts: Sorts{}, limit: 0, pipeline: mongo.Pipeline{}}
 }
 
 func (c *CollManager) Filters(f Filters) *CollManager {

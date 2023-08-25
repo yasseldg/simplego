@@ -21,12 +21,12 @@ func (f *Filters) Append(key string, value interface{}) *Filters {
 func (f *Filters) TsField(ts_from, ts_to int64, field string) *Filters {
 	if ts_from > 0 {
 		if ts_to > 0 {
-			return f.Append(field, bson.D{{"$gte", ts_from}, {"$lt", ts_to}})
+			return f.Int64_gte_lt(field, ts_from, ts_to)
 		}
-		return f.Append(field, bson.D{{"$gte", ts_from}})
+		return f.Int64_gte(field, ts_from)
 	}
 	if ts_to > 0 {
-		f.Append(field, bson.D{{"$lt", ts_to}})
+		return f.Int64_lt(field, ts_to)
 	}
 	return f
 }
@@ -60,20 +60,24 @@ func (f *Filters) Int_nin(field string, values []int) *Filters {
 	return f.Append(field, bson.D{{"$nin", values}})
 }
 
-func (f *Filters) Int_gt(field string, value int64) *Filters {
+func (f *Filters) Int_gt(field string, value int) *Filters {
 	return f.Append(field, bson.D{{"$gt", value}})
 }
 
-func (f *Filters) Int_gte(field string, value float64) *Filters {
+func (f *Filters) Int_gte(field string, value int) *Filters {
 	return f.Append(field, bson.D{{"$gte", value}})
 }
 
-func (f *Filters) Int_lt(field string, value int64) *Filters {
+func (f *Filters) Int_lt(field string, value int) *Filters {
 	return f.Append(field, bson.D{{"$lt", value}})
 }
 
-func (f *Filters) Int_lte(field string, value float64) *Filters {
+func (f *Filters) Int_lte(field string, value int) *Filters {
 	return f.Append(field, bson.D{{"$lte", value}})
+}
+
+func (f *Filters) Int_gte_lte(field string, value_1, value_2 int) *Filters {
+	return f.Append(field, bson.D{{"$gte", value_1}, {"$lte", value_2}})
 }
 
 // int64
@@ -101,6 +105,14 @@ func (f *Filters) Int64_lte(field string, value int64) *Filters {
 	return f.Append(field, bson.D{{"$lte", value}})
 }
 
+func (f *Filters) Int64_gte_lt(field string, value_1, value_2 int64) *Filters {
+	return f.Append(field, bson.D{{"$gte", value_1}, {"$lt", value_2}})
+}
+
+func (f *Filters) Int64_gte_lte(field string, value_1, value_2 int64) *Filters {
+	return f.Append(field, bson.D{{"$gte", value_1}, {"$lte", value_2}})
+}
+
 // float64
 func (f *Filters) Float64_in(field string, values []float64) *Filters {
 	return f.Append(field, bson.D{{"$in", values}})
@@ -124,6 +136,10 @@ func (f *Filters) Float64_lt(field string, value float64) *Filters {
 
 func (f *Filters) Float64_lte(field string, value float64) *Filters {
 	return f.Append(field, bson.D{{"$lte", value}})
+}
+
+func (f *Filters) Float64_gte_lte(field string, value_1, value_2 float64) *Filters {
+	return f.Append(field, bson.D{{"$gte", value_1}, {"$lte", value_2}})
 }
 
 // *** Older code TODO: remove

@@ -45,6 +45,17 @@ func (c *Collection) Update(obj mgm.Model) bool {
 	return true
 }
 
+// Upsert
+func (c *Collection) Upsert(obj mgm.Model, field string) bool {
+
+	err := c.Collection.Update(obj, options.Update().SetUpsert(true))
+	if err != nil {
+		sLog.Error("sMongo: %sUpsert(&obj): %s  ..  obj: %#v", c.prefix(), err, obj)
+		return false
+	}
+	return true
+}
+
 // Count
 func (c *Collection) Count(filter interface{}, opts *options.CountOptions) (int64, error) {
 

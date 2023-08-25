@@ -83,9 +83,9 @@ func importGz(file_path string) ([][]string, error) {
 
 type SaveFunc func(objs []mgm.Model, coll sMongo.Collection) int
 type ObjFunc func(data []string) (obj mgm.Model)
-type ImportFunc func(file_path string, obj_func ObjFunc, save_func SaveFunc, batch_size int, coll sMongo.Collection) (err error)
+type ImportFunc func(file_path string, obj_func ObjFunc, save_func SaveFunc, batch_size int, coll sMongo.Collection) error
 
-func ImportAndSave(file_path string, obj_func ObjFunc, save_func SaveFunc, batch_size int, coll sMongo.Collection) (err error) {
+func ImportAndSave(file_path string, obj_func ObjFunc, save_func SaveFunc, batch_size int, coll sMongo.Collection) error {
 	var importFunc ImportFunc
 
 	switch {
