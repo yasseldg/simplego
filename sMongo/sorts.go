@@ -1,6 +1,7 @@
 package sMongo
 
 import (
+	"github.com/yasseldg/simplego/sLog"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -9,6 +10,10 @@ type Sorts struct {
 }
 
 func Sort() *Sorts { return &Sorts{Fields: bson.D{}} }
+
+func (s *Sorts) Log(msg string) {
+	sLog.Debug("%s: Sorts: %v", msg, s.Fields)
+}
 
 // Append agrega un nuevo campo de ordenación con su dirección.
 func (s *Sorts) Append(key string, value int) *Sorts {

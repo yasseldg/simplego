@@ -1,6 +1,7 @@
 package sMongo
 
 import (
+	"github.com/yasseldg/simplego/sLog"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -10,6 +11,10 @@ type Filters struct {
 }
 
 func Filter() *Filters { return &Filters{Fields: bson.D{}} }
+
+func (f *Filters) Log(msg string) {
+	sLog.Debug("%s: Filters: %v", msg, f.Fields)
+}
 
 // Append adds a new filter field.
 func (f *Filters) Append(key string, value interface{}) *Filters {
@@ -47,11 +52,19 @@ func (f *Filters) String_in(field string, values []string) *Filters {
 }
 
 // ObjectId
+func (f *Filters) ObjectId(field string, value primitive.ObjectID) *Filters {
+	return f.Append(field, value)
+}
+
 func (f *Filters) ObjectId_in(field string, values []primitive.ObjectID) *Filters {
 	return f.Append(field, bson.D{{"$in", values}})
 }
 
 // int
+func (f *Filters) Int(field string, value int) *Filters {
+	return f.Append(field, value)
+}
+
 func (f *Filters) Int_in(field string, values []int) *Filters {
 	return f.Append(field, bson.D{{"$in", values}})
 }
@@ -81,6 +94,10 @@ func (f *Filters) Int_gte_lte(field string, value_1, value_2 int) *Filters {
 }
 
 // int64
+func (f *Filters) Int64(field string, value int64) *Filters {
+	return f.Append(field, value)
+}
+
 func (f *Filters) Int64_in(field string, values []int64) *Filters {
 	return f.Append(field, bson.D{{"$in", values}})
 }
@@ -114,6 +131,10 @@ func (f *Filters) Int64_gte_lte(field string, value_1, value_2 int64) *Filters {
 }
 
 // float64
+func (f *Filters) Float64(field string, value float64) *Filters {
+	return f.Append(field, value)
+}
+
 func (f *Filters) Float64_in(field string, values []float64) *Filters {
 	return f.Append(field, bson.D{{"$in", values}})
 }
