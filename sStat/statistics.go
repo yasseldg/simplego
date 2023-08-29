@@ -52,3 +52,26 @@ func ValidFloat64(f float64) float64 {
 	}
 	return f
 }
+
+func Zscore(value, mean, std_dev float64) float64 {
+	return ValidFloat64((math.Abs(value) - math.Abs(mean)) / math.Abs(std_dev))
+}
+
+func ZscoreAbs(value, mean, std_dev float64) float64 {
+	return math.Abs(Zscore(value, mean, std_dev))
+}
+
+// Perc Category
+func PercCategory(value, min, max float64, n int) int {
+	if value <= min {
+		return 1
+	}
+	if value >= max {
+		return n
+	}
+	return int((value-min)/PercStep(min, max, n)) + 1
+}
+
+func PercStep(min, max float64, n int) float64 {
+	return (max - min) / float64(n)
+}
