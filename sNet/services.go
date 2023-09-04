@@ -20,7 +20,7 @@ func GetServices(env string, defaults ...string) (objs Services) {
 	return
 }
 
-func (s Services) Log(name string) {
+func (s Services) Log() {
 	for _, service := range s {
 		service.Log()
 	}
