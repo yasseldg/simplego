@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"path"
 	"strings"
 	"time"
 
@@ -21,6 +22,7 @@ type Header struct {
 type Headers []Header
 
 type Config struct {
+	Env        string
 	Url        string
 	Secure     bool
 	Port       int
@@ -36,32 +38,37 @@ func GetConfig(env string) *Config {
 	if err != nil {
 		sLog.Fatal("sNet: getConf: can't load env file %s: %s", name, err)
 	}
-	conf.Update(env)
+	conf.Env = env
+	conf.Update()
 	return &conf
 }
 
-func (c *Config) Update(env string) {
-	c.Url = sEnv.Get(fmt.Sprintf("%s_Url", env), c.Url)
-	c.Port = sConv.GetInt(sEnv.Get(fmt.Sprintf("%s_Port", env), sConv.GetStrI(c.Port)))
-	c.Secure = sConv.GetBool(sEnv.Get(fmt.Sprintf("%s_Secure", env), sConv.GetStrB(c.Secure)))
-	c.PathPrefix = sEnv.Get(fmt.Sprintf("%s_Path_Prefix", env), c.PathPrefix)
+func (c Config) Log() {
+	sLog.Info("%s: %s ", c.Env, c.GetUrl())
+}
+
+func (c *Config) Update() {
+	c.Url = sEnv.Get(fmt.Sprintf("%s_Url", c.Env), c.Url)
+	c.Port = sConv.GetInt(sEnv.Get(fmt.Sprintf("%s_Port", c.Env), sConv.GetStrI(c.Port)))
+	c.Secure = sConv.GetBool(sEnv.Get(fmt.Sprintf("%s_Secure", c.Env), sConv.GetStrB(c.Secure)))
+	c.PathPrefix = sEnv.Get(fmt.Sprintf("%s_Path_Prefix", c.Env), c.PathPrefix)
+}
+
+func (c *Config) AddPathPrefixs(path_prefixs ...string) {
+	c.PathPrefix = path.Join(c.PathPrefix, path.Join(path_prefixs...))
 }
 
 func (c *Config) AddHeaders(headers Headers) {
 	c.Headers = append(c.Headers, headers...)
 }
 
-func (c *Config) Print(name string) {
-	sLog.Info("%s: %s ", name, c.GetUrl())
-}
-
-func (c *Config) GetUrl() string {
+func (c Config) GetUrl() string {
 	url := c.Url
 	if c.Port > 0 {
 		url = fmt.Sprintf("%s:%d", url, c.Port)
 	}
 	if len(c.PathPrefix) > 0 {
-		url = fmt.Sprintf("%s/%s", url, c.PathPrefix)
+		url = path.Join(url, c.PathPrefix)
 	}
 	if c.Secure {
 		return fmt.Sprintf("https://%s", url)
@@ -69,14 +76,14 @@ func (c *Config) GetUrl() string {
 	return fmt.Sprintf("http://%s", url)
 }
 
-func (c *Config) GetHandlerPath(handler string) string {
+func (c Config) GetHandlerPath(handler string) string {
 	if len(c.PathPrefix) > 0 {
 		return fmt.Sprintf("/%s/%s", c.PathPrefix, handler)
 	}
 	return fmt.Sprintf("/%s", handler)
 }
 
-func (c *Config) Call(method string, params string, body io.Reader) ([]byte, error) {
+func (c Config) Call(method string, params string, body io.Reader) ([]byte, error) {
 
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
@@ -120,10 +127,16 @@ func (c *Config) Call(method string, params string, body io.Reader) ([]byte, err
 	return resp_body, nil
 }
 
-func (c *Config) SendObj(method string, body_obj any) ([]byte, error) {
+func (c Config) SendObj(method string, body_obj any) ([]byte, error) {
 	body_str, err := sJson.ToJson(body_obj)
 	if err != nil {
 		return nil, fmt.Errorf("json.Marshal(body): %s", err)
 	}
 	return c.Call(method, "obj", strings.NewReader(body_str))
+}
+
+// ---- Delete ----
+
+func (c Config) Print(name string) {
+	c.Log()
 }
