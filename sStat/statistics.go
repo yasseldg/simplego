@@ -54,7 +54,7 @@ func ValidFloat64(f float64) float64 {
 }
 
 func Zscore(value, mean, std_dev float64) float64 {
-	return ValidFloat64((math.Abs(value) - math.Abs(mean)) / math.Abs(std_dev))
+	return ValidFloat64((value - mean) / std_dev)
 }
 
 func ZscoreAbs(value, mean, std_dev float64) float64 {
