@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type Form struct {
+type FormDates struct {
 	TsFrom int64
 	TsTo   int64
 }
@@ -23,7 +23,7 @@ func ReadDate(field, layout string, r *http.Request, msg *FlashMessages) int64 {
 	return date_time.Unix()
 }
 
-func DatesForm(form *Form, layout string, msg *FlashMessages, r *http.Request) {
-	form.TsFrom = ReadDate("ts_from", layout, r, msg)
-	form.TsTo = ReadDate("ts_to", layout, r, msg)
+func (f *FormDates) Read(layout string, msg *FlashMessages, r *http.Request) {
+	f.TsFrom = ReadDate("ts_from", layout, r, msg)
+	f.TsTo = ReadDate("ts_to", layout, r, msg)
 }
