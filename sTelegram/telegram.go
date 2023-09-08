@@ -2,7 +2,6 @@ package sTelegram
 
 import (
 	"fmt"
-	"sync"
 
 	"github.com/yasseldg/simplego/sConv"
 	"github.com/yasseldg/simplego/sEnv"
@@ -21,7 +20,6 @@ type Bot struct {
 	ChatId int64
 	Token  string
 	Func   ReadFunc
-	M      sync.Mutex
 }
 
 type SendObject struct {
@@ -42,7 +40,7 @@ func NewBot(token string, chat_id int64, read_func ReadFunc) *Bot {
 		read_func = defaultFunc
 	}
 	sLog.Debug("NewTelegramBot: chat_id: %d, read_func: %v", chat_id, read_func)
-	return &Bot{ChatId: chat_id, Token: token, Func: read_func, M: sync.Mutex{}}
+	return &Bot{ChatId: chat_id, Token: token, Func: read_func}
 }
 
 func (t *Bot) Start() {
@@ -56,19 +54,26 @@ func (t *Bot) Start() {
 	bot.Debug = sConv.GetBool(sEnv.Get("TelegramDebug", "false"))
 	t.Bot = bot
 
+	t.Send(SendObject{ChatId: t.ChatId, Message: fmt.Sprintf("Starting ... %s ", t.Bot.Self.UserName)})
+
 	go t.read()
 }
 
-func (t Bot) Send(msg string) {
+func (t Bot) Send(obj SendObject) {
 	if t.Bot == nil {
 		sLog.Error("TelegramBot.Send: bot is nil")
 		return
 	}
 
-	newMsg := tgbotapi.NewMessage(t.ChatId, msg)
+	if obj.ChatId == 0 {
+		obj.ChatId = t.ChatId
+	}
+
+	newMsg := tgbotapi.NewMessage(obj.ChatId, obj.Message)
 	_, err := t.Bot.Send(newMsg)
 	if err != nil {
 		sLog.Error("TelegramBot.Send: %s", err)
+		t.Send(SendObject{ChatId: t.ChatId, Message: fmt.Sprintf("Error sending ... %s \n Chat ID:    %d \n Message:  %s", err, obj.ChatId, obj.Message)})
 	}
 }
 
@@ -85,9 +90,9 @@ func (t *Bot) read() {
 
 	updates := t.Bot.GetUpdatesChan(u)
 	for update := range updates {
-		str := t.Func(&update)
-		if len(str) > 0 {
-			t.Send(str)
+		msg := t.Func(&update)
+		if len(msg) > 0 {
+			t.Send(SendObject{ChatId: t.ChatId, Message: msg})
 		}
 	}
 }
