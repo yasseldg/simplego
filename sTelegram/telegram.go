@@ -54,7 +54,7 @@ func (t *Bot) Start() {
 	bot.Debug = sConv.GetBool(sEnv.Get("TelegramDebug", "false"))
 	t.Bot = bot
 
-	t.Send(SendObject{ChatId: t.ChatId, Message: fmt.Sprintf("Starting ... %s ", t.Bot.Self.UserName)})
+	t.Send(SendObject{ChatId: t.ChatId, Message: fmt.Sprintf("Starting ... \n\n %s ", t.Bot.Self.UserName)})
 
 	go t.read()
 }
@@ -73,7 +73,7 @@ func (t Bot) Send(obj SendObject) {
 	_, err := t.Bot.Send(newMsg)
 	if err != nil {
 		sLog.Error("TelegramBot.Send: %s", err)
-		t.Send(SendObject{ChatId: t.ChatId, Message: fmt.Sprintf("Error sending ... %s \n Chat ID:    %d \n Message:  %s", err, obj.ChatId, obj.Message)})
+		t.Send(SendObject{ChatId: t.ChatId, Message: fmt.Sprintf("Error sending ... \n%s \n Chat ID:     %d \n Message: \n%s", err, obj.ChatId, obj.Message)})
 	}
 }
 

@@ -2,6 +2,7 @@ package sMongo
 
 import (
 	"github.com/yasseldg/mgm/v4"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -16,7 +17,7 @@ type CollManager struct {
 
 func Coll(env, connection, database, collection, interval string) CollManager {
 	return CollManager{Collection: *New(env, connection, database, collection, interval),
-		filters: Filters{}, sorts: Sorts{}, limit: 0, pipeline: mongo.Pipeline{}}
+		filters: Filters{Fields: bson.D{}}, sorts: Sorts{Fields: bson.D{}}, limit: 0, pipeline: mongo.Pipeline{}}
 }
 
 func (c *CollManager) Filters(f Filters) *CollManager {
