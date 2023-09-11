@@ -26,11 +26,12 @@ func (s Services) Log() {
 	}
 }
 
-func (s Services) SendObj(body_obj any) {
+// default action is "obj"
+func (s Services) SendObj(action string, body_obj any) {
 	for _, service := range s {
-		_, err := service.SendObj("POST", body_obj)
+		_, err := service.SendObj("POST", action, body_obj)
 		if err != nil {
-			sLog.Error("(%s).SendObj: %v  ..  err: %s", service.Url, body_obj, err)
+			sLog.Error("(%s).SendObj: action: %s  ..  %v  ..  err: %s", service.Url, action, body_obj, err)
 		}
 	}
 }

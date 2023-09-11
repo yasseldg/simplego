@@ -127,12 +127,16 @@ func (c Config) Call(method string, params string, body io.Reader) ([]byte, erro
 	return resp_body, nil
 }
 
-func (c Config) SendObj(method string, body_obj any) ([]byte, error) {
+// default action is "obj"
+func (c Config) SendObj(method, action string, body_obj any) ([]byte, error) {
+	if len(action) == 0 {
+		action = "obj"
+	}
 	body_str, err := sJson.ToJson(body_obj)
 	if err != nil {
 		return nil, fmt.Errorf("json.Marshal(body): %s", err)
 	}
-	return c.Call(method, "obj", strings.NewReader(body_str))
+	return c.Call(method, action, strings.NewReader(body_str))
 }
 
 // ---- Delete ----
