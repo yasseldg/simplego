@@ -9,8 +9,11 @@ import (
 )
 
 func Functions(name ...string) template.FuncMap {
-
 	return template.FuncMap{
+		"Float": func(f float64, prec int) string {
+			return FormatFloat(f, prec)
+		},
+
 		"FormatF": func(f float64, dec string) string {
 			return FormatF(f, dec)
 		},
@@ -65,6 +68,15 @@ func Functions(name ...string) template.FuncMap {
 			return sConv.GetRangeLimits(str, vt)
 		}}
 }
+
+func FormatFloat(f float64, prec int) string {
+	if prec < 0 {
+		return fmt.Sprintf("%f", f)
+	}
+	return fmt.Sprintf(fmt.Sprintf("%%.%df", prec), f)
+}
+
+//  ----  OLD verion ----
 
 func FormatF(f float64, dec string) string {
 	prec := "%." + dec + "f"

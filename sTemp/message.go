@@ -20,6 +20,13 @@ func (fm *FlashMessages) Error(format string, a ...any) {
 	}
 }
 
+func (fm *FlashMessages) Warning(format string, a ...any) {
+	msg := fmt.Sprintf(format, a...)
+	if len(msg) > 0 {
+		*fm = append(*fm, &FlashMessage{Message: msg, Type: "warn"})
+	}
+}
+
 func (fm *FlashMessages) Info(format string, a ...any) {
 	msg := fmt.Sprintf(format, a...)
 	if len(msg) > 0 {
