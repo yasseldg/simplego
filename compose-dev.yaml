@@ -1,12 +1,17 @@
 services:
-  vscode:
+  vscode_simple:
     image: docker/dev-environments-go:stable-1
     container_name: vscode_simple
+    labels:
+      - dev.orbstack.domains=simplego.local
     entrypoint:
     - sleep
     - infinity
     init: true
     volumes:
+    - type: bind
+      source: .
+      target: /mnt/workspace
     - type: bind
       source: /var/run/docker.sock
       target: /var/run/docker.sock
@@ -15,4 +20,4 @@ services:
 
 networks:
   go_dev:
-    name: go_dev
+    external: true
