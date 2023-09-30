@@ -57,6 +57,10 @@ func (f *Filters) NotStates(states ...string) *Filters { f.String_nin("st", stat
 // -----
 
 // string
+func (f *Filters) String_like(field string, value string) *Filters {
+	return f.Append(field, bson.D{{Key: "$regex", Value: value}, {Key: "$options", Value: "i"}})
+}
+
 func (f *Filters) String_in(field string, values ...string) *Filters {
 	return f.Append(field, bson.D{{Key: "$in", Value: values}})
 }
