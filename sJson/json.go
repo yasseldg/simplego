@@ -27,7 +27,7 @@ func ToJson(v interface{}) (string, error) {
 }
 
 func Export(path string, objects any) error {
-	f, err := os.Create(path)
+	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		sLog.Error("ExportJson: os.OpenFile( %s ) : %s", path, err)
 		return err

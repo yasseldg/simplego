@@ -40,6 +40,10 @@ func Functions(name ...string) template.FuncMap {
 			return v1 / v2
 		},
 
+		"DivInt64": func(v1, v2 int64) int64 {
+			return v1 / v2
+		},
+
 		"SumI": func(v1, v2 int) int {
 			return v1 + v2
 		},
