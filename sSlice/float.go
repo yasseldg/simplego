@@ -1,8 +1,10 @@
 package sSlice
 
 import (
+	"fmt"
 	"math"
 	"sort"
+	"strings"
 
 	"github.com/yasseldg/simplego/sConv"
 	"github.com/yasseldg/simplego/unique"
@@ -171,4 +173,12 @@ func WeightF(values []float64, prec int) map[float64]float64 {
 	}
 
 	return weights
+}
+
+func FloatsToString(s []float64, prec int) string {
+	strs := make([]string, len(s))
+	for i, v := range s {
+		strs[i] = fmt.Sprintf("%.*f", prec, v)
+	}
+	return strings.Join(strs, ", ")
 }
