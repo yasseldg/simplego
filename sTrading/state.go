@@ -18,6 +18,7 @@ const (
 	State_CancelTs    = State(4) // CancelTs: Max Excursion Time permitted from Trigger
 	State_CancelPrice = State(5) // CancelPrice: Max Favorable Excursion permitted from Entry
 	State_NotEntry    = State(6) // NotEntry: Never reached Entry Price
+	State_BrakeEven   = State(7) // BrakeEven: Never reached Brake Even Price
 	State_DEFAULT     = State(0)
 )
 
@@ -37,6 +38,8 @@ func GetState(s string) State {
 		return State_CancelPrice
 	case "notentry", "not_entry", "6":
 		return State_NotEntry
+	case "brakeeven", "brake_even", "7":
+		return State_BrakeEven
 
 	default:
 		return State_DEFAULT
@@ -59,6 +62,8 @@ func (s State) String() string {
 		return "CancelPrice"
 	case State_NotEntry:
 		return "NotEntry"
+	case State_BrakeEven:
+		return "BrakeEven"
 	default:
 		return "-"
 	}
