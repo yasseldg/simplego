@@ -17,6 +17,8 @@ func GetIntervalMinutes(interval string) int64 {
 		min = 5
 	case Interval_15m:
 		min = 15
+	case Interval_30m:
+		min = 30
 	case Interval_1h:
 		min = 60
 	case Interval_4h:
