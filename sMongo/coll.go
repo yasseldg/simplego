@@ -59,3 +59,7 @@ func (c *CollManager) FindOne(obj mgm.Model) error {
 func (c *CollManager) Agregates(docs interface{}) error {
 	return c.Collection.Agregates(c.pipeline, docs)
 }
+
+func (c *CollManager) Drop() error {
+	return c.Collection.Drop()
+}
