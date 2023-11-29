@@ -4,8 +4,10 @@ import (
 	"fmt"
 
 	"github.com/yasseldg/mgm/v4"
+
 	"github.com/yasseldg/simplego/sEnv"
 	"github.com/yasseldg/simplego/sLog"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -68,6 +70,8 @@ func (m *Manager) getClient(env, conn_name string) (*Client, error) {
 }
 
 func (m *Manager) setClient(env, conn_name string) (*Client, error) {
+
+	mgm.SetDefaultConfig(getCtx(env))
 
 	conn := getConnection(sEnv.Get(fmt.Sprint("CONN_", env), conn_name))
 
