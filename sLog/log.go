@@ -63,3 +63,7 @@ func Info(template string, args ...interface{}) {
 func Debug(template string, args ...interface{}) {
 	sugaredLogger.Debugf(template, args...)
 }
+
+func NewLogger() *zap.SugaredLogger {
+	return sugaredLogger
+}

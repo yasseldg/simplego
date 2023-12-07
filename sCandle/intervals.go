@@ -100,3 +100,14 @@ func GetInterval(interval string) Interval {
 		return Interval_DEFAULT
 	}
 }
+
+func GetIntervals(intervals ...string) (res []Interval) {
+	for _, interval := range intervals {
+		i := GetInterval(interval)
+		if i.IsDefault() {
+			continue
+		}
+		res = append(res, i)
+	}
+	return
+}
