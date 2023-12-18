@@ -26,6 +26,7 @@ type Config struct {
 	Url        string
 	Secure     bool
 	Port       int
+	Network    string
 	PathPrefix string
 	Headers    Headers
 }
@@ -51,6 +52,7 @@ func (c *Config) Update() {
 	c.Url = sEnv.Get(fmt.Sprintf("%s_Url", c.Env), c.Url)
 	c.Port = sConv.GetInt(sEnv.Get(fmt.Sprintf("%s_Port", c.Env), sConv.GetStrI(c.Port)))
 	c.Secure = sConv.GetBool(sEnv.Get(fmt.Sprintf("%s_Secure", c.Env), sConv.GetStrB(c.Secure)))
+	c.Network = sEnv.Get(fmt.Sprintf("%s_Network", c.Env), c.Network)
 	c.PathPrefix = sEnv.Get(fmt.Sprintf("%s_Path_Prefix", c.Env), c.PathPrefix)
 }
 
@@ -62,14 +64,19 @@ func (c *Config) AddHeaders(headers Headers) {
 	c.Headers = append(c.Headers, headers...)
 }
 
-func (c Config) GetUrl() string {
-	url := c.Url
+func (c Config) GetUri() string {
+	uri := c.Url
 	if c.Port > 0 {
-		url = fmt.Sprintf("%s:%d", url, c.Port)
+		uri = fmt.Sprintf("%s:%d", uri, c.Port)
 	}
 	if len(c.PathPrefix) > 0 {
-		url = path.Join(url, c.PathPrefix)
+		uri = path.Join(uri, c.PathPrefix)
 	}
+	return uri
+}
+
+func (c Config) GetUrl() string {
+	url := c.GetUri()
 	if c.Secure {
 		return fmt.Sprintf("https://%s", url)
 	}
