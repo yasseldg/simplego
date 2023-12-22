@@ -3,6 +3,7 @@ package sDate
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/yasseldg/simplego/sEnv"
@@ -111,5 +112,46 @@ func fromInt64(value int64) time.Time {
 	} else {
 		// Si el valor es mayor o igual a 1e15, se trata de un timestamp en microsegundos
 		return time.Unix(value/1e6, (value%1e6)*1e3)
+	}
+}
+
+func Since(d time.Duration) string {
+	if d == 0 {
+		return "0s"
+	}
+
+	neg := d < 0
+	if neg {
+		d = -d
+	}
+
+	var builder strings.Builder
+	b := false
+	u := uint64(d)
+
+	if u < uint64(time.Minute) {
+		appendDurationPart(&builder, &u, uint64(time.Second), "%ds ", &b)
+		appendDurationPart(&builder, &u, uint64(time.Millisecond), "%dms ", &b)
+		appendDurationPart(&builder, &u, uint64(time.Microsecond), "%dµs ", &b)
+		builder.WriteString(fmt.Sprintf("%dns ", u)) // Directly append nanoseconds
+	} else {
+		appendDurationPart(&builder, &u, 24*uint64(time.Hour), "%dd ", &b)
+		appendDurationPart(&builder, &u, uint64(time.Hour), "%dh ", &b)
+		appendDurationPart(&builder, &u, uint64(time.Minute), "%dm ", &b)
+		builder.WriteString(fmt.Sprintf("%ds ", u/uint64(time.Second)))
+	}
+
+	if neg {
+		return "-" + builder.String()
+	}
+	return builder.String()
+}
+
+func appendDurationPart(builder *strings.Builder, u *uint64, unit uint64, format string, b *bool) {
+	value := *u / unit
+	if value > 0 || *b {
+		fmt.Fprintf(builder, format, value)
+		*u -= value * unit
+		*b = true
 	}
 }
