@@ -40,10 +40,10 @@ func NewManager() Manager {
 
 func (m Manager) Log() {
 	println()
-	for _, client := range m.clients {
+	for conn_name, client := range m.clients {
 		for _, database := range client.databases {
 			for _, collection := range database.collections {
-				sLog.Info("client: %s  ..  database: %s  ..  coll: %s \n", client.connection.Environment, database.database.Name(), collection.Collection.Collection.Name())
+				sLog.Info("client: %s  ..  env: %s  ..  database: %s  ..  coll: %s \n", conn_name, client.connection.Environment, database.database.Name(), collection.Collection.Collection.Name())
 			}
 		}
 	}
@@ -61,6 +61,8 @@ func (m *Manager) GetColl(env, conn_name, db_name, coll_name string, indexes ...
 
 func (m *Manager) getClient(env, conn_name string) (*Client, error) {
 
+	conn_name = sEnv.Get(fmt.Sprint("CONN_", env), conn_name)
+
 	client := m.clients.get(conn_name)
 	if client != nil {
 		return client, nil
@@ -73,7 +75,7 @@ func (m *Manager) setClient(env, conn_name string) (*Client, error) {
 
 	mgm.SetDefaultConfig(getCtx(env))
 
-	conn := getConnection(sEnv.Get(fmt.Sprint("CONN_", env), conn_name))
+	conn := getConnection(conn_name)
 
 	client, err := mgm.NewClient(conn.getClientOpt())
 	if err != nil {
